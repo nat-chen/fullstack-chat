@@ -1,9 +1,11 @@
+import { UsersModule } from './../users/users.module';
 import { Module } from '@nestjs/common';
-import { Services } from '../utils/types';
+import { Services } from '../utils/constants';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 @Module({
+  imports: [UsersModule],
   controllers: [AuthController],
   providers: [
     {
