@@ -15,7 +15,7 @@ import { IUserService } from '../users/user';
 import { Routes, Services } from '../utils/constants';
 import { IAuthService } from './auth';
 import { CreateUserDto } from './dtos/CreateUser.dto';
-import { LocalAuthGuard, AuthenticateGuard } from './utils/Guards';
+import { LocalAuthGuard, AuthenticatedGuard } from './utils/Guards';
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -36,7 +36,7 @@ export class AuthController {
     return res.send(HttpStatus.OK);
   }
 
-  @UseGuards(AuthenticateGuard)
+  @UseGuards(AuthenticatedGuard)
   @Get('status')
   status(@Req() req: Request, @Res() res: Response) {
     console.log(req.user);
