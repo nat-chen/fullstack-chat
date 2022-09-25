@@ -5,4 +5,6 @@ export interface IUserService {
   createUser(userDetails: CreateUserDetails): Promise<User>;
 
   findUser(findUserParams: FindUserParams): Promise<User>;
+
+  saveUser(user: User): Promise<User>;
 }
