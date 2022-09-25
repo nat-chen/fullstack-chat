@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Inject, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthenticatedGuard } from 'src/auth/utils/Guards';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -26,10 +34,8 @@ export class ConversationsController {
   }
 
   @Get()
-  async getConversations(@AuthUser() user: User) {
-    const { id } = user.participant;
-    const conversation = await this.conversationsService.find(id);
-    return conversation;
+  async getConversations(@AuthUser() { id }: User) {
+    return this.conversationsService.getConversations(id);
   }
 
   @Get(':id')
