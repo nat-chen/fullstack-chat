@@ -1,8 +1,11 @@
 import { FC, useContext, useEffect } from 'react';
 import { formatRelative } from 'date-fns';
 import { AuthContext } from '../../utils/context/AuthContext';
+import { useSelector } from 'react-redux';
 import { MessageContainerStyle, MessageItemAvatar, MessageItemContainer, MessageItemContent, MessageItemDetails, MessageItemHeader } from '../../utils/styles';
 import { User, MessageType } from '../../utils/types';
+import { useParams } from 'react-router-dom';
+import { RootState } from '../../store';
 
 type Props = {
   messages: MessageType[];
@@ -43,28 +46,33 @@ export const FormattedMessage: FC<FormattedMessageProps> = ({ user, message }) =
 
 export const MessageContainer: FC<Props> = ({ messages }) => {
   const { user } = useContext(AuthContext);
+  const { id } = useParams();
+  const conversationMessages = useSelector((state: RootState) => state.conversation.messages);
   const formatMessages = () => {
     return messages.map((m, index, arr) => {
-      console.log(index);
-      const nextIndex = index + 1;
-      const currentMessage = arr[index];
-      const nextMessage = arr[nextIndex];
-      console.log(currentMessage);
-      console.log(nextMessage);
-      if (arr.length === nextIndex) {
-        console.log('At the end');
-        return <FormattedMessage key={m.id} user={user} message={m} />;
-      }
-      if (currentMessage.author.id === nextMessage.author.id) {
-        return (
-          <MessageItemContainer key={m.id}>
-            <MessageItemContent padding="0 0 0 70px">
-              {m.content}
-            </MessageItemContent>
-          </MessageItemContainer>
-        )
-      }
-      return <FormattedMessage key={m.id} user={user} message={m} />
+      const msgs = conversationMessages.find((cm) => cm.id === parseInt(id!));
+      if (!msgs) return [];
+      return msgs?.messages?.map((m, index, arr) => {
+        const nextIndex = index + 1;
+        const currentMessage = arr[index];
+        const nextMessage = arr[nextIndex];
+        console.log(currentMessage);
+        console.log(nextMessage);
+        if (arr.length === nextIndex) {
+          console.log('At the end');
+          return <FormattedMessage key={m.id} user={user} message={m} />;
+        }
+        if (currentMessage.author.id === nextMessage.author.id) {
+          return (
+            <MessageItemContainer key={m.id}>
+              <MessageItemContent padding="0 0 0 70px">
+                {m.content}
+              </MessageItemContent>
+            </MessageItemContainer>
+          )
+        }
+        return <FormattedMessage key={m.id} user={user} message={m} />
+      });
     });
   };
 

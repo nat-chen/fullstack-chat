@@ -11,18 +11,18 @@ import styles from './index.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
 import { AuthContext } from '../../utils/context/AuthContext';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 
 type Props = {
   conversations: ConversationType[];
 };
 
-export const ConversationSidebar: FC<Props> = ({ conversations }) => {
+export const ConversationSidebar: FC<Props> = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
-  const conversation = useSelector((state: RootState) => state.conversation.conversations);
+  const conversations = useSelector((state: RootState) => state.conversation.conversations);
 
   const getDisplayUser = (conversation: ConversationType) => {
     return conversation.creator.id === user?.id
@@ -41,8 +41,8 @@ export const ConversationSidebar: FC<Props> = ({ conversations }) => {
         </ConversationSidebarHeader>
 
         <ConversationSidebarContainer>
-          {Array.from(conversation, ([_, conversation]) => conversation)
-            .map(conversation => (
+          {
+            conversations.map(conversation => (
               <ConversationSidebarItem
                 key={conversation.id}
                 onClick={() => navigate(`/conversations/${conversation.id}`)}
