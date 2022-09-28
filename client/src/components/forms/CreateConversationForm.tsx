@@ -19,7 +19,9 @@ export const CreateConversationForm = () => {
         <InputLabel>Message (optional)</InputLabel>
         <InputContainer />
       </section>
-      <Button onClick={(e) => e.preventDefault()}>Create Conversation</Button>
+      <Button
+        onClick={(e) => e.preventDefault()}
+      >Create Conversation</Button>
     </form>
   )
 }
