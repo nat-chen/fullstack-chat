@@ -202,6 +202,7 @@ export const MessagePanelBody = styled.div`
   display: flex;
   flex-direction: column;
   padding: 32px;
+  padding-top: 0;
   box-sizing: border-box;
 `;
 
