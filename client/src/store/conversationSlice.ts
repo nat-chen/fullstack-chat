@@ -33,7 +33,7 @@ export const conversationsSlice = createSlice({
   reducers: {
     addConversation: (state, action: PayloadAction<ConversationType>) => {
       console.log('add conversation');
-      // state.conversations.push(action.payload);
+      state.conversations.unshift(action.payload);
     },
     updateConversation: (state, action: PayloadAction<ConversationType>) => {
       console.log('Inside updateConversation');
