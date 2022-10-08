@@ -21,10 +21,10 @@ export const MessagePanel: FC<Props> = ({ sendTypingStatus }) => {
     if (!id || !content) return;
     const conversationId = parseInt(id);
     try {
-      await postNewMessage({
+      await postNewMessage(
         conversationId,
-        content
-      });
+        { content }
+      );
       setContent('');
     } catch (err) {
       console.log(err);

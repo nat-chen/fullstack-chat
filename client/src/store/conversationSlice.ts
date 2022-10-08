@@ -44,7 +44,6 @@ export const conversationsSlice = createSlice({
       state.conversations.splice(index, 1);
       state.conversations.unshift(conversation);
     }
-
   },
   extraReducers: (builder) => {
     builder
