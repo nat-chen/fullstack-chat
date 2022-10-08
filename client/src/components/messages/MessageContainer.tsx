@@ -47,7 +47,7 @@ export const FormattedMessage: FC<FormattedMessageProps> = ({ user, message }) =
 export const MessageContainer: FC<Props> = ({ messages }) => {
   const { user } = useContext(AuthContext);
   const { id } = useParams();
-  const conversationMessages = useSelector((state: RootState) => state.conversation.messages);
+  const conversationMessages = useSelector((state: RootState) => state.messages.messages);
   const formatMessages = () => {
     return messages.map((m, index, arr) => {
       const msgs = conversationMessages.find((cm) => cm.id === parseInt(id!));
