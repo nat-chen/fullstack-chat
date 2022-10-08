@@ -44,35 +44,32 @@ export const FormattedMessage: FC<FormattedMessageProps> = ({ user, message }) =
   );
 };
 
-export const MessageContainer: FC<Props> = ({ messages }) => {
+export const MessageContainer = () => {
   const { user } = useContext(AuthContext);
   const { id } = useParams();
   const conversationMessages = useSelector((state: RootState) => state.messages.messages);
   const formatMessages = () => {
-    return messages.map((m, index, arr) => {
-      const msgs = conversationMessages.find((cm) => cm.id === parseInt(id!));
-      if (!msgs) return [];
-      return msgs?.messages?.map((m, index, arr) => {
-        const nextIndex = index + 1;
-        const currentMessage = arr[index];
-        const nextMessage = arr[nextIndex];
-        console.log(currentMessage);
-        console.log(nextMessage);
-        if (arr.length === nextIndex) {
-          console.log('At the end');
-          return <FormattedMessage key={m.id} user={user} message={m} />;
-        }
-        if (currentMessage.author.id === nextMessage.author.id) {
-          return (
-            <MessageItemContainer key={m.id}>
-              <MessageItemContent padding="0 0 0 70px">
-                {m.content}
-              </MessageItemContent>
-            </MessageItemContainer>
-          )
-        }
-        return <FormattedMessage key={m.id} user={user} message={m} />
-      });
+    const msgs = conversationMessages.find((cm) => cm.id === parseInt(id!));
+    if (!msgs) return [];
+    return msgs?.messages?.map((m, index, arr) => {
+      const nextIndex = index + 1;
+      const currentMessage = arr[index];
+      const nextMessage = arr[nextIndex];
+      console.log(currentMessage);
+      console.log(nextMessage);
+      if (arr.length === nextIndex) {
+        return <FormattedMessage key={m.id} user={user} message={m} />;
+      }
+      if (currentMessage.author.id === nextMessage.author.id) {
+        return (
+          <MessageItemContainer key={m.id}>
+            <MessageItemContent padding="0 0 0 70px">
+              {m.content}
+            </MessageItemContent>
+          </MessageItemContainer>
+        )
+      }
+      return <FormattedMessage key={m.id} user={user} message={m} />
     });
   };
 
