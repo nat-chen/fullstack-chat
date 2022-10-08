@@ -25,8 +25,9 @@ export type ConversationType = {
   lastMessageSent: MessageType;
 }
 
-export type CreateConversationsParams = {
-  recipient: string;
+export type CreateConversationParams = {
+  email: string;
+  message: string;
 }
 
 export type MessageType = {
