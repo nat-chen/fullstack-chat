@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { InputContainerProps, MessageItemContentProps, PageProps } from './styleTypes';
+import styled, { css } from 'styled-components';
+import { ContextMenuProps, InputContainerProps, MessageItemContentProps, PageProps } from './styleTypes';
 
 export const SIDEBAR_WIDTH = 400;
 
@@ -208,6 +208,7 @@ export const MessagePanelBody = styled.div`
 
 export const MessageContainerStyle = styled.div`
   height: 100%;
+  position: relative;
   box-sizing: border-box;
   padding: 10px 0;
   display: flex;
@@ -277,3 +278,29 @@ export const MessageItemHeader = styled.div`
 export const MessageItemContent = styled.div<MessageItemContentProps>`
   padding: ${({ padding }) => padding};
 `;
+
+export const ContextMenuStyle = styled.div<ContextMenuProps>`
+  border-radius: 8px;
+  box-sizing: border-box;
+  position: fixed;
+  width: 200px;
+  background-color: #252525;
+  ${(props) => css`
+    top: ${props.top}px;
+    left: ${props.left}px;
+  `}
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 10px;
+  }
+  ul li {
+    padding: 14px 16px;
+    border-radius: 8px;
+  }
+  ul li:hover {
+    cursor: pointer;
+    background-color: #1f1f1f;
+  }
+`;
+
