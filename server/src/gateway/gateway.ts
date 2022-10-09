@@ -6,12 +6,13 @@ import {
   WebSocketServer,
   SubscribeMessage,
   MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Services } from 'src/utils/constants';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import { Server } from 'typeorm';
-import { Message } from 'src/utils/typeorm';
+import { Message, Conversation } from 'src/utils/typeorm';
 import { CreateMessageResponse } from 'src/utils/types';
 
 @WebSocketGateway({
@@ -41,6 +42,16 @@ export class MessagingGateway implements OnGatewayConnection {
     console.log('Create Message');
   }
 
+  @SubscribeMessage('onClientConnect')
+  onClientConnect(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    console.log('onClientConnect');
+    console.log(data);
+    console.log(client.user);
+  }
+
   @OnEvent('message.create')
   handleMessageCreateEvent(payload: CreateMessageResponse) {
     console.log('Inside message.create');
@@ -58,5 +69,13 @@ export class MessagingGateway implements OnGatewayConnection {
 
     if (authorSocket) authorSocket.emit('onMessage', payload);
     if (recipientSocket) recipientSocket.emit('onMessage', payload);
+  }
+
+  @OnEvent('conversation.create')
+  handleConversationCreateEvent(payload: Conversation) {
+    console.log('Inside conversation.create');
+    console.log(payload.recipient);
+    const recipientSocket = this.sessions.getUserSocket(payload.recipient.id);
+    if (recipientSocket) recipientSocket.emit('onConversation', payload);
   }
 }
