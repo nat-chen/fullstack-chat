@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Patch,
   Inject,
   Param,
   ParseIntPipe,
@@ -13,6 +14,7 @@ import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import { CreateMessageDto } from './dtos/CreateMessage.dto';
+import { EditMessageDto } from './dtos/EditMessage';
 import { IMessageService } from './messages';
 
 @Controller(Routes.MESSAGES)
@@ -58,5 +60,24 @@ export class MessageController {
       conversationId,
       messageId,
     });
+    this.eventEmitter.emit('message.delete', {
+      userId: user.id,
+      messageId,
+      conversationId,
+    });
+    return { conversationId, messageId };
+  }
+
+  // api/conversations/:conversationId/messages/:messageId
+  @Patch(':messageId')
+  async editMessage(
+    @AuthUser() { id: userId }: User,
+    @Param('id') conversationId: number,
+    @Param('messageId') messageId: number,
+    @Body() { content }: EditMessageDto,
+  ) {
+    const params = { userId, content, conversationId, messageId };
+    const message = await this.messageService.editMessage(params);
+    return message;
   }
 }
