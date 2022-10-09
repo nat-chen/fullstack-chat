@@ -1,8 +1,17 @@
 import { IGatewaySessionManager } from './gateway.session';
 import { Inject } from '@nestjs/common';
-import { WebSocketGateway, OnGatewayConnection, WebSocketServer, SubscribeMessage, MessageBody } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  OnGatewayConnection,
+  WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+} from '@nestjs/websockets';
 import { Services } from 'src/utils/constants';
 import { OnEvent } from '@nestjs/event-emitter';
+import { AuthenticatedSocket } from 'src/utils/interfaces';
+import { Server } from 'typeorm';
+import { Message } from 'src/utils/typeorm';
 
 @WebSocketGateway({
   cors: {
@@ -16,15 +25,15 @@ export class MessagingGateway implements OnGatewayConnection {
     private readonly sessions: IGatewaySessionManager,
   ) {}
 
+  @WebSocketServer()
+  server: Server;
+
   handleConnection(socket: AuthenticatedSocket, ...args: any[]) {
     console.log('New Incoming Connection');
     console.log(socket.user);
     this.sessions.setUserSocket(socket.user.id, socket);
     socket.emit('connected', { status: 'good' });
   }
-
-  @WebSocketServer()
-  server: Server;
 
   @SubscribeMessage('createMessage')
   handleCreateMessage(@MessageBody() data: any) {
@@ -46,7 +55,7 @@ export class MessagingGateway implements OnGatewayConnection {
         : this.sessions.getUserSocket(creator.id);
     console.log(`Recipient Socket: ${JSON.stringify(recipientSocket.user)}`);
 
-    recipientSocket.emit('onMessage', payload);
-    authorSocket.emit('onMessage', payload);
+    if (authorSocket) authorSocket.emit('onMessage', payload);
+    if (recipientSocket) recipientSocket.emit('onMessage', payload);
   }
 }
