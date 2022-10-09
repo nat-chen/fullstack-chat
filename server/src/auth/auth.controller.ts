@@ -26,7 +26,6 @@ export class AuthController {
 
   @Post('register')
   async registerUser(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
     return instanceToPlain(await this.userService.createUser(createUserDto));
   }
 
@@ -39,7 +38,6 @@ export class AuthController {
   @UseGuards(AuthenticatedGuard)
   @Get('status')
   status(@Req() req: Request, @Res() res: Response) {
-    console.log(req.user);
     res.send(req.user);
   }
 
