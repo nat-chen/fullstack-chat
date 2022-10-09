@@ -3,7 +3,7 @@ export enum Routes {
   USERS = 'users',
   CONVERSATIONS = 'conversations',
   PARTICIPANTS = 'participants',
-  MESSAGES = 'messages',
+  MESSAGES = 'conversations/:id/messages',
 }
 
 export enum Services {
