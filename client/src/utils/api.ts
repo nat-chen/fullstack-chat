@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { ConversationType, CreateConversationParams, CreateMessageParams, CreateUserParams, DeleteMessageParams, DeleteMessageResponse, FetchMessagePayload, User, UserCredentialsParams } from './types'
+import { ConversationType, CreateConversationParams, CreateMessageParams, CreateUserParams, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, FetchMessagePayload, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const config: AxiosRequestConfig = { withCredentials: true };
@@ -41,5 +41,16 @@ export const deleteMessage = ({
 }: DeleteMessageParams) =>
   axios.delete<DeleteMessageResponse>(
     `${API_URL}/conversations/${conversationId}/messages/${messageId}`,
+    config
+  );
+
+export const editMessage = ({
+  content,
+  conversationId,
+  messageId,
+}: EditMessagePayload) =>
+  axios.patch(
+    `${API_URL}/conversations/${conversationId}/messages/${messageId}`,
+    { content },
     config
   );
