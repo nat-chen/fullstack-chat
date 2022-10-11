@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { MessagePanel } from '../components/messages/MessagePanel';
-import { SocketContext } from '../utils/context/SocketContext';
-import { ConversationChannelPageStyle } from "../utils/styles";
-import { AppDispatch } from '../store';
-import { fetchMessagesThunk } from '../store/messageSlice';
-import { editMessage } from '../utils/api';
-import { MessageType } from '../utils/types';
+import { MessagePanel } from '../../components/messages/MessagePanel';
+import { SocketContext } from '../../utils/context/SocketContext';
+import { ConversationChannelPageStyle } from "../../utils/styles";
+import { AppDispatch } from '../../store';
+import { fetchMessagesThunk } from '../../store/messageSlice';
+import { editMessage } from '../../utils/api';
+import { MessageType } from '../../utils/types';
 
 export const ConversationChannelPage = () => {
   const { id } = useParams();
