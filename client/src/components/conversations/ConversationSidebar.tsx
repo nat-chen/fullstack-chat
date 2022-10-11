@@ -4,10 +4,8 @@ import {
   ConversationSidebarStyle,
 } from "../../utils/styles";
 import { TbEdit } from 'react-icons/tb';
-import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
-import { AuthContext } from '../../utils/context/AuthContext';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { ConversationSelected } from './ConversationSelected';
@@ -15,8 +13,6 @@ import { GroupSidebarItem } from '../groups/GroupSidebarItem';
 import { ConversationSidebarItem } from './ConversationSidebarItem';
 
 export const ConversationSidebar = () => {
-  const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const conversations = useSelector((state: RootState) => state.conversation.conversations);
   const groups = useSelector((state: RootState) => state.groups.groups);
