@@ -14,6 +14,7 @@ import { store } from './store';
 import { enableMapSet } from 'immer';
 import { GroupPage } from './pages/group/GroupPage';
 import { GroupChannelPage } from './pages/group/GroupChannelPage';
+import { AppPage } from './pages/AppPage';
 
 enableMapSet();
 
@@ -47,25 +48,19 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route
-        path="conversations"
         element={
           <AuthenticatedRoute>
-            <ConversationPage />
+            <AppPage />
           </AuthenticatedRoute>
         }
       >
-        <Route path=":id" element={<ConversationChannelPage />} />
-      </Route>
-      <Route
-          path="groups"
-          element={
-            <AuthenticatedRoute>
-              <GroupPage />
-            </AuthenticatedRoute>
-          }
-        >
+        <Route path="conversations" element={<ConversationPage />}>
+          <Route path=":id" element={<ConversationChannelPage />} />
+        </Route>
+        <Route path="groups" element={<GroupPage />}>
           <Route path=":id" element={<GroupChannelPage />} />
         </Route>
+      </Route>
       </Routes>
     </AppWithProviders>
   )

@@ -49,7 +49,6 @@ export const ConversationPage = () => {
 
   return (
     <Page>
-      <ConversationSidebar />
       {!id && <ConversationPanel />}
       <Outlet />
     </Page>

@@ -19,7 +19,6 @@ export const GroupPage = () => {
 
   return (
     <Page>
-      <ConversationSidebar />
       {!id && <ConversationPanel />}
       <Outlet />
     </Page>
