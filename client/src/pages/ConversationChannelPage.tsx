@@ -7,6 +7,7 @@ import { ConversationChannelPageStyle } from "../utils/styles";
 import { AppDispatch } from '../store';
 import { fetchMessagesThunk } from '../store/messageSlice';
 import { editMessage } from '../utils/api';
+import { MessageType } from '../utils/types';
 
 export const ConversationChannelPage = () => {
   const { id } = useParams();
@@ -41,7 +42,7 @@ export const ConversationChannelPage = () => {
     socket.on('onMessageUpdate', (message) => {
       console.log('onMessageUpdate received');
       console.log(message);
-      dispatch(editMessage(message));
+      // dispatch(editMessage(message));
     })
     return () => {
       socket.emit('onConversationLeave', { conversationId });

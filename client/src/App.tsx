@@ -43,9 +43,19 @@ function App() {
     <AppWithProviders user={user} setUser={setUser} socket={socket}>
       <Routes>
       <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="conversations"
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="conversations"
+        element={
+          <AuthenticatedRoute>
+            <ConversationPage />
+          </AuthenticatedRoute>
+        }
+      >
+        <Route path=":id" element={<ConversationChannelPage />} />
+      </Route>
+      <Route
+          path="groups"
           element={
             <AuthenticatedRoute>
               <ConversationPage />

@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ConversationType, CreateConversationParams } from '../utils/types';
+import { Conversation, CreateConversationParams } from '../utils/types';
 import { getConversations, postNewConversation } from '../utils/api';
 import { RootState } from '.';
 
 export interface ConversationState {
-  conversations: ConversationType[];
+  conversations: Conversation[];
   loading: boolean;
 }
 
@@ -31,11 +31,11 @@ export const conversationsSlice = createSlice({
   name: 'conversations',
   initialState,
   reducers: {
-    addConversation: (state, action: PayloadAction<ConversationType>) => {
+    addConversation: (state, action: PayloadAction<Conversation>) => {
       console.log('add conversation');
       state.conversations.unshift(action.payload);
     },
-    updateConversation: (state, action: PayloadAction<ConversationType>) => {
+    updateConversation: (state, action: PayloadAction<Conversation>) => {
       console.log('Inside updateConversation');
       const conversation = action.payload;
       const index = state.conversations.findIndex(
