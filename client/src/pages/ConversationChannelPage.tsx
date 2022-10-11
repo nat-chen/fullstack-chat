@@ -1,14 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { MessagePanel } from '../components/messages/MessagePanel';
-import { AuthContext } from '../utils/context/AuthContext';
 import { SocketContext } from '../utils/context/SocketContext';
 import { ConversationChannelPageStyle } from "../utils/styles";
-import { MessageEventPayload, MessageType } from '../utils/types';
-import { AppDispatch, RootState } from '../store';
-import { addMessage, fetchMessagesThunk } from '../store/messageSlice';
-import { updateConversation } from '../store/conversationSlice';
+import { AppDispatch } from '../store';
+import { fetchMessagesThunk } from '../store/messageSlice';
+import { editMessage } from '../utils/api';
 
 export const ConversationChannelPage = () => {
   const { id } = useParams();
@@ -40,12 +38,18 @@ export const ConversationChannelPage = () => {
       console.log('onTypingStop: User has stopped typing...');
       setIsRecipientTyping(false);
     });
+    socket.on('onMessageUpdate', (message) => {
+      console.log('onMessageUpdate received');
+      console.log(message);
+      dispatch(editMessage(message));
+    })
     return () => {
       socket.emit('onConversationLeave', { conversationId });
       socket.off('userJoin');
       socket.off('userLeave');
       socket.off('onTypingStart');
       socket.off('onTypingStop');
+      socket.off('onMessageUpdate');
     };
   }, [id]);
 

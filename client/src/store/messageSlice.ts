@@ -1,6 +1,6 @@
 import { deleteMessage as deleteMessageAPI, editMessage as editMessageAPI, getConversationMessages } from './../utils/api';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ConversationMessage, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, MessageEventPayload } from './../utils/types';
+import { ConversationMessage, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, MessageEventPayload, MessageType } from './../utils/types';
 
 export interface MessageState {
   messages: ConversationMessage[];
@@ -58,7 +58,19 @@ export const messagesSlice = createSlice({
       console.log(messageIndex);
       console.log(payload);
       conversationMessages.messages.splice(messageIndex, 1);
-    }
+    },
+    editMessage: (state, action: PayloadAction<MessageType>) => {
+      console.log('editMessageReducer');
+      const message = action.payload;
+      const conversationMessage = state.messages.find(
+        (cm) => cm.id === message.conversation.id
+      );
+      if (!conversationMessage) return;
+      const messageIndex = conversationMessage.messages.findIndex(
+        (m) => m.id === message.id
+      );
+      conversationMessage.messages[messageIndex] = message;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -100,6 +112,6 @@ export const messagesSlice = createSlice({
   }
 });
 
-export const { addMessage, deleteMessage } = messagesSlice.actions;
+export const { addMessage, deleteMessage, editMessage } = messagesSlice.actions;
 
 export default messagesSlice.reducer;
