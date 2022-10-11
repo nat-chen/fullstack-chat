@@ -9,7 +9,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(Services.AUTH) private readonly authService: IAuthService,
   ) {
-    super({ usernameField: 'email' });
+    super({ usernameField: 'email' }); // passport-local 策略默认接收请求体 username 和 password 属性，此处使用别名指定
   }
   async validate(email: string, password: string) {
     return this.authService.validateUser({ email, password });

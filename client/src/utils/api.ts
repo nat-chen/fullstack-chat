@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { ConversationType, CreateConversationParams, CreateMessageParams, CreateUserParams, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, FetchMessagePayload, User, UserCredentialsParams } from './types'
+import { ConversationType, CreateConversationParams, CreateMessageParams, CreateUserParams, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, FetchMessagePayload, MessageType, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const config: AxiosRequestConfig = { withCredentials: true };
@@ -49,7 +49,7 @@ export const editMessage = ({
   conversationId,
   messageId,
 }: EditMessagePayload) =>
-  axios.patch(
+  axios.patch<MessageType>(
     `${API_URL}/conversations/${conversationId}/messages/${messageId}`,
     { content },
     config

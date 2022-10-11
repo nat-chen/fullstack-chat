@@ -25,3 +25,29 @@ export class SessionSerializer extends PassportSerializer {
     return userDb ? done(null, userDb) : done(null, null);
   }
 }
+
+/*
+验证的方式有两种：JWT 和 session
+1. 官方文档使用 JWT
+2. 继承 PassportServializer 使用 session
+Passport uses `serializeUser` function to persist user data (after successful authentication) into session.
+Function `deserializeUser` is used to retrieve user data from session.
+
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});              │
+                 │
+                 │
+                 └─────────────────┬──→ saved to session
+                                   │    req.session.passport.user = {id: '..'}
+                                   │
+                                   ↓
+passport.deserializeUser(function(id, done) {
+                   ┌───────────────┘
+                   │
+                   ↓
+    User.findById(id, function(err, user) {
+        done(err, user);
+    });            └──────────────→ user object attaches to the request as req.user
+});
+*/

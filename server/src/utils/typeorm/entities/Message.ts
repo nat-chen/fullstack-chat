@@ -22,6 +22,6 @@ export class Message {
   @ManyToOne(() => User, (user) => user.messages)
   author: User;
 
-  @ManyToMany(() => Conversation, (conversation) => conversation.messages)
+  @ManyToOne(() => Conversation, (conversation) => conversation.messages)
   conversation: Conversation;
 }
