@@ -1,8 +1,10 @@
+import { GroupConversation } from './GroupConversations';
 import { Exclude } from 'class-transformer';
 import {
   Column,
   Entity,
   JoinColumn,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -29,4 +31,7 @@ export class User {
   @OneToMany(() => Message, (message) => message.author)
   @JoinColumn()
   messages: Message[];
+
+  @ManyToMany(() => GroupConversation, (group) => group.users)
+  groups: GroupConversation[];
 }
