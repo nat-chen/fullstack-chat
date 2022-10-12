@@ -1,4 +1,4 @@
-import { GroupConversation } from './GroupConversations';
+import { Group } from './Group';
 import { Exclude } from 'class-transformer';
 import {
   Column,
@@ -32,6 +32,6 @@ export class User {
   @JoinColumn()
   messages: Message[];
 
-  @ManyToMany(() => GroupConversation, (group) => group.users)
-  groups: GroupConversation[];
+  @ManyToMany(() => Group, (group) => group.users)
+  groups: Group[];
 }
