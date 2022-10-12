@@ -1,7 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { IUserService } from 'src/users/user';
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Group } from 'src/utils/typeorm';
 import { IGroupService } from './group';
+import { Services } from 'src/utils/constants';
+import { Repository } from 'typeorm';
+import { CreateGroupParams } from 'src/utils/types';
 
 @Injectable()
 export class GroupService implements IGroupService {
-  createGroup() {}
+  constructor(
+    @InjectRepository(Group)
+    private readonly groupRepository: Repository<Group>,
+    @Inject(Services.USERS)
+    private readonly userService: IUserService,
+  ) {}
+
+  async createGroup(params: CreateGroupParams) {
+    const { creator, title } = params;
+    const usersPromise = params.users.map((email) =>
+      this.userService.findUser({ email }),
+    );
+    const users = (await Promise.all(usersPromise)).filter((user) => user);
+    users.push(creator);
+    console.log(users);
+    const group = this.groupRepository.create({ users, creator, title });
+    return this.groupRepository.save(group);
+  }
 }
