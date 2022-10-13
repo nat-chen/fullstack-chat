@@ -11,12 +11,14 @@ import { AuthUser } from 'src/utils/decorators';
 import { Routes, Services } from 'src/utils/constants';
 import { User } from 'src/utils/typeorm';
 import { IGroupMessageService } from './group-messages';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller(Routes.GROUP_MESSAGES)
 export class GroupMessageController {
   constructor(
     @Inject(Services.GROUP_MESSAGES)
     private readonly groupMessageService: IGroupMessageService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
@@ -26,10 +28,12 @@ export class GroupMessageController {
     @Body() { content }: CreateMessageDto,
   ) {
     console.log(`Creating Group Message for ${id}`);
-    await this.groupMessageService.createGroupMessage({
+    const response = await this.groupMessageService.createGroupMessage({
       author: user,
       groupId: id,
       content,
     });
+    this.eventEmitter.emit('group.message.create', response);
+    return;
   }
 }
