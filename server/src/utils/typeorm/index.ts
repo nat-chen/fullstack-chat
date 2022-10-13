@@ -1,11 +1,12 @@
-import { Message } from './entities/Message';
-import { Conversation } from './entities/Conversation';
 import { User } from './entities/User';
-import { Session } from './entities/Session';
+import { Message } from './entities/Message';
+import { GroupMessage } from './entities/GroupMesage';
 import { Group } from './entities/Group';
+import { Conversation } from './entities/Conversation';
+import { Session } from './entities/Session';
 
-const entities = [User, Session, Conversation, Message, Group];
+const entities = [User, Session, Conversation, Message, Group, GroupMessage];
 
 export default entities;
 
-export { User, Session, Conversation, Message, Group };
+export { User, Session, Conversation, Message, Group, GroupMessage };
