@@ -53,7 +53,9 @@ export class MessagingGateway implements OnGatewayConnection {
     @MessageBody() data: any,
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    console.log('onConversationJoin');
+    console.log(
+      `${client.user?.id} joined a Conversation of ID: ${data.conversationId}`,
+    );
     client.join(`conversation-${data.conversationId}`);
     console.log(client.rooms);
     client.to(`conversation-${data.conversationId}`).emit('userJoin');
@@ -118,17 +120,11 @@ export class MessagingGateway implements OnGatewayConnection {
   handleMessageCreateEvent(payload: CreateMessageResponse) {
     console.log('Inside message.create');
     console.log(payload);
-    const {
-      author,
-      conversation: { creator, recipient },
-    } = payload.message;
-    const authorSocket = this.sessions.getUserSocket(author.id);
-    const recipientSocket =
-      author.id === creator.id
-        ? this.sessions.getUserSocket(recipient.id)
-        : this.sessions.getUserSocket(creator.id);
-    if (authorSocket) authorSocket.emit('onMessage', payload);
-    if (recipientSocket) recipientSocket.emit('onMessage', payload);
+    const { author, conversation } = payload.message;
+    console.log(this.server.sockets.adapter.rooms);
+    this.server
+      .to(`conversation-${conversation.id}`)
+      .emit('onMessage', payload);
   }
 
   @OnEvent('conversation.create')
