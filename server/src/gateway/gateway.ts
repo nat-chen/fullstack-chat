@@ -8,12 +8,15 @@ import {
   MessageBody,
   ConnectedSocket,
 } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 import { Services } from 'src/utils/constants';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Server } from 'typeorm';
 import { Message, Conversation } from 'src/utils/typeorm';
-import { CreateGroupMessageResponse, CreateMessageResponse } from 'src/utils/types';
+import {
+  CreateGroupMessageResponse,
+  CreateMessageResponse,
+} from 'src/utils/types';
 import { IConversationsService } from 'src/conversations/conversations';
 
 @WebSocketGateway({
@@ -65,6 +68,28 @@ export class MessagingGateway implements OnGatewayConnection {
     client.leave(`conversation-${data.conversationId}`);
     console.log(client.rooms);
     client.to(`conversation-${data.conversationId}`).emit('userLeave');
+  }
+
+  @SubscribeMessage('onGroupJoin')
+  onGroupJoin(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    console.log('onGroupJoin');
+    client.join(`group-${data.groupId}`);
+    console.log(client.rooms);
+    client.to(`group-${data.groupId}`).emit('userGroupJoin');
+  }
+
+  @SubscribeMessage('onGroupLeave')
+  onGroupLeave(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    console.log('onGroupLeave');
+    client.leave(`group-${data.groupId}`);
+    console.log(client.rooms);
+    client.to(`group-${data.groupId}`).emit('userGroupLeave');
   }
 
   @SubscribeMessage('onTypingStart')
@@ -145,5 +170,9 @@ export class MessagingGateway implements OnGatewayConnection {
   }
 
   @OnEvent('group.message.create')
-  async handleGroupMessage(payload: CreateGroupMessageResponse) {}
+  async handleGroupMessageCreate(payload: CreateGroupMessageResponse) {
+    const { id } = payload.group;
+    console.log('Inside group.message.create');
+    this.server.to(`group-${id}`).emit('onGroupMessage', payload);
+  }
 }

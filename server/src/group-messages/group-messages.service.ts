@@ -40,4 +40,14 @@ export class GroupMessageService implements IGroupMessageService {
     const updatedGroup = this.groupService.saveGroup(group);
     return { message: savedMessage, group: updatedGroup };
   }
+
+  getGroupMessages(id: number): Promise<GroupMessage[]> {
+    return this.groupMessageRepository.find({
+      where: { group: { id } },
+      relations: ['author'],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
 }
