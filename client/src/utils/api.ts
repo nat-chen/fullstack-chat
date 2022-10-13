@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { Conversation, CreateConversationParams, CreateMessageParams, CreateUserParams, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, FetchMessagePayload, Group, MessageType, User, UserCredentialsParams } from './types'
+import { Conversation, CreateConversationParams, CreateMessageParams, CreateUserParams, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Group, MessageType, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const config: AxiosRequestConfig = { withCredentials: true };
@@ -57,3 +57,10 @@ export const editMessage = ({
 
 export const fetchGroups = () =>
   axios.get<Group[]>(`${API_URL}/groups`, config);
+
+export const fetchGroupMessages = (id: number) => {
+  axios.get<FetchGroupMessagePayload>(
+    `${API_URL}/groups/${id}/messages`,
+    config,
+  );
+}
