@@ -1,29 +1,28 @@
 import { formatRelative } from 'date-fns';
 import { Dispatch, SetStateAction } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import { MessageItemAvatar, MessageItemContainer, MessageItemContent, MessageItemDetails, MessageItemHeader } from '../../utils/styles';
-import { MessageType, User } from '../../utils/types';
+import { GroupMessageType, MessageType, User } from '../../utils/types';
 import { EditMessageContainer } from './EditMessageContainer';
 
 type FormattedMessageProps = {
   user?: User;
-  message: MessageType;
-  selectedEditMessage: MessageType | null;
+  message: MessageType | GroupMessageType;
   key: number;
-  isEditing: boolean;
   onContextMenu: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   onEditMessageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  setIsEditing: Dispatch<SetStateAction<boolean>>;
 };
 
 export const FormattedMessage: React.FC<FormattedMessageProps> = ({
   user,
   message,
   onContextMenu,
-  isEditing,
-  selectedEditMessage,
   onEditMessageChange,
-  setIsEditing,
 }) => {
+  const { isEditingMessage, messageBeingEdited} = useSelector(
+    (state: RootState) => state.messageContainer
+  );
   return (
     <MessageItemContainer onContextMenu={onContextMenu}>
       <MessageItemAvatar />
@@ -41,13 +40,9 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
             {formatRelative(new Date(message.createdAt), new Date())}
           </span>
         </MessageItemHeader>
-        {isEditing && message.id === selectedEditMessage?.id ? (
+        {isEditingMessage && message.id === messageBeingEdited?.id ? (
           <MessageItemContent padding="8px 0 0 0">
-            <EditMessageContainer
-              selectedEditMessage={selectedEditMessage}
-              onEditMessageChange={onEditMessageChange}
-              setIsEditing={setIsEditing}
-            />
+            <EditMessageContainer onEditMessageChange={onEditMessageChange} />
           </MessageItemContent>
         ) : (
           <MessageItemContent padding="8px 0 0 0">
