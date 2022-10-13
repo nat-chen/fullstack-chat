@@ -1,6 +1,8 @@
 import { deleteMessage as deleteMessageAPI, editMessage as editMessageAPI, getConversationMessages } from './../utils/api';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ConversationMessage, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, MessageEventPayload, MessageType } from './../utils/types';
+import { RootState } from '.';
+import { sassTrue } from 'sass';
 
 export interface MessageState {
   messages: ConversationMessage[];
@@ -111,6 +113,15 @@ export const messagesSlice = createSlice({
       });
   }
 });
+
+const selectConversationMessages = (state: RootState) => state.messages.messages;
+
+const selectConversationMessageId = (state: RootState, id: number) => id;
+
+export const selectConversationMessage = createSelector(
+  [selectConversationMessages, selectConversationMessageId],
+  (conversationMessages, id) => conversationMessages.find((cm) => cm.id === id)
+);
 
 export const { addMessage, deleteMessage, editMessage } = messagesSlice.actions;
 

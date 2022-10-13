@@ -1,15 +1,15 @@
-import React, { FC, useContext, useEffect, useState } from 'react';
-import { formatRelative } from 'date-fns';
+import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../utils/context/AuthContext';
 import { useSelector } from 'react-redux';
-import { MessageContainerStyle, MessageItemAvatar, MessageItemContainer, MessageItemContent, MessageItemDetails, MessageItemHeader } from '../../utils/styles';
-import { User, MessageType } from '../../utils/types';
+import { MessageContainerStyle, MessageItemContainer, MessageItemContent } from '../../utils/styles';
+import { MessageType } from '../../utils/types';
 import { useParams } from 'react-router-dom';
 import { RootState } from '../../store';
 import { MessageMenuContext } from '../../utils/context/MessageMenuContext';
 import { SelectedMessageContextMenu } from '../context-menus/SelectedMessageContextMenu';
 import { EditMessageContainer } from './EditMessageContainer';
 import { FormattedMessage } from './FormattedMessage';
+import { selectConversationMessage } from '../../store/messageSlice';
 
 export const MessageContainer = () => {
   const [showMenu, setShowModal] = useState(false);
@@ -18,9 +18,8 @@ export const MessageContainer = () => {
   const { id } = useParams();
   const [selectedMessage, setSelectedMessage] = useState<MessageType | null>(null);
   const [selectedEditMessage, setSelectedEditMessage] = useState<MessageType | null>(null);
-  const [originalEditMessage, setOriginalEditMessage] = useState(selectedEditMessage);
   const [isEditing, setIsEditing] = useState(false);
-  const conversationMessages = useSelector((state: RootState) => state.messages.messages);
+  const conversationMessages = useSelector((state: RootState) => selectConversationMessage(state, parseInt(id!)));
   const onContextMenu = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     message: MessageType,
@@ -57,9 +56,9 @@ export const MessageContainer = () => {
   }, [id]);
 
   const formatMessages = () => {
-    const msgs = conversationMessages.find((cm) => cm.id === parseInt(id!));
-    if (!msgs) return [];
-    return msgs?.messages?.map((m, index, arr) => {
+    if (!conversationMessages) return [];
+    console.log(conversationMessages);
+    return conversationMessages.messages.map((m, index, arr) => {
       const nextIndex = index + 1;
       const currentMessage = arr[index];
       const nextMessage = arr[nextIndex];
