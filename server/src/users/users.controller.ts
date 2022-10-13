@@ -1,7 +1,26 @@
-import { Controller } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { IUserService } from 'src/users/user';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Query,
+} from '@nestjs/common';
+import { Routes, Services } from 'src/utils/constants';
 
-@Controller('users')
+@Controller(Routes.USERS)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    @Inject(Services.USERS) private readonly userService: IUserService,
+  ) {}
+
+  @Get('search')
+  searchUsers(@Query('query') query: string) {
+    console.log('query');
+    if (!query) {
+      throw new HttpException('Provide a valid query', HttpStatus.BAD_REQUEST);
+    }
+    return this.userService.searchUsers(query);
+  }
 }
