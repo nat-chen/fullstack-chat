@@ -1,13 +1,39 @@
 import { PeopleGroup } from 'akar-icons';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom'
 import { RootState } from '../../store';
 import { selectGroupById } from '../../store/groupSlice';
+import { SocketContext } from '../../utils/context/SocketContext';
 import { GroupRecipientSidebarItem, GroupRecipientSidebarItemContainer, GroupRecipientsSidebarHeader, GroupRecipientsSidebarStyle, MessageItemAvatar } from '../../utils/styles';
+import { User } from '../../utils/types';
 
 export const GroupRecipientsSidebar = () => {
-  const { id } = useParams();
-  const group = useSelector((state: RootState) => selectGroupById(state, parseInt(id!)));
+  const { id: groupId } = useParams();
+  const group = useSelector((state: RootState) => selectGroupById(state, parseInt(groupId!)));
+  const socket = useContext(SocketContext);
+  const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
+  const [offlineUsers, setOfflineUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    socket.emit('getOnlineGroupUsers', { groupId });
+    const interval = setInterval(() => {
+      console.log(`Pinging Group ${groupId}`);
+      socket.emit('getOnlineGroupUsers', { groupId });
+    }, 10000);
+    socket.on('onlineGroupUsersReceived', (payload) => {
+      console.log('received payload for online users');
+      console.log(payload);
+      setOnlineUsers(payload.onlineUsers);
+      setOfflineUsers(payload.offlineUsers);
+    });
+    return () => {
+      console.log('Clearing Interval for GroupRecipientsSidebar');
+      clearInterval(interval);
+      socket.off('onlineGroupUsersReceived');
+    };
+  });
+
   return (
     <GroupRecipientsSidebarStyle>
       <GroupRecipientsSidebarHeader>
@@ -15,7 +41,15 @@ export const GroupRecipientsSidebar = () => {
         <PeopleGroup />
       </GroupRecipientsSidebarHeader>
       <GroupRecipientSidebarItemContainer>
-        {group?.users.map((user) => (
+      <span>Online Users</span>
+        {onlineUsers.map((user) => (
+          <GroupRecipientSidebarItem>
+            <MessageItemAvatar />
+            <span>{user.firstName}</span>
+          </GroupRecipientSidebarItem>
+        ))}
+        <span>Offline Users</span>
+        {offlineUsers.map((user) => (
           <GroupRecipientSidebarItem>
             <MessageItemAvatar />
             <span>{user.firstName}</span>
