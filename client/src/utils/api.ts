@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { Conversation, CreateConversationParams, CreateMessageParams, CreateUserParams, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Group, MessageType, User, UserCredentialsParams } from './types'
+import { Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Group, MessageType, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const axiosClient = axios.create({ baseURL: API_URL });
@@ -65,5 +65,5 @@ export const postGroupMessage = ({ id, content }: CreateMessageParams) =>
 export const searchUsers = (query: string) =>
   axiosClient.get<User[]>(`/users/search?query=${query}`, config);
 
-export const createGroup = (users: string[]) =>
-  axiosClient.post(`/groups`, { users }, config);
+export const createGroup = (params: CreateGroupParams) =>
+  axiosClient.post(`/groups`, params, config);

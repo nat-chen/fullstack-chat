@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '.';
 import { fetchGroups as fetchGroupsAPI, createGroup as createGroupAPI, } from '../utils/api';
-import { Group } from '../utils/types';
+import { CreateGroupParams, Group } from '../utils/types';
 
 export interface GroupState {
   groups: Group[];
@@ -17,7 +17,7 @@ export const fetchGroupsThunk = createAsyncThunk('group/fetch', () => {
 
 export const createGroupThunk = createAsyncThunk(
   'groups/create',
-  (users: string[]) => createGroupAPI(users)
+  (params: CreateGroupParams) => createGroupAPI(params)
 );
 
 export const groupsSlice = createSlice({
