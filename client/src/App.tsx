@@ -15,6 +15,8 @@ import { enableMapSet } from 'immer';
 import { GroupPage } from './pages/group/GroupPage';
 import { GroupChannelPage } from './pages/group/GroupChannelPage';
 import { AppPage } from './pages/AppPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 enableMapSet();
 
@@ -45,23 +47,24 @@ function App() {
   return (
     <AppWithProviders user={user} setUser={setUser} socket={socket}>
       <Routes>
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        element={
-          <AuthenticatedRoute>
-            <AppPage />
-          </AuthenticatedRoute>
-        }
-      >
-        <Route path="conversations" element={<ConversationPage />}>
-          <Route path=":id" element={<ConversationChannelPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          element={
+            <AuthenticatedRoute>
+              <AppPage />
+            </AuthenticatedRoute>
+          }
+        >
+          <Route path="conversations" element={<ConversationPage />}>
+            <Route path=":id" element={<ConversationChannelPage />} />
+          </Route>
+          <Route path="groups" element={<GroupPage />}>
+            <Route path=":id" element={<GroupChannelPage />} />
+          </Route>
         </Route>
-        <Route path="groups" element={<GroupPage />}>
-          <Route path=":id" element={<GroupChannelPage />} />
-        </Route>
-      </Route>
       </Routes>
+      <ToastContainer theme="dark" />
     </AppWithProviders>
   )
 }
