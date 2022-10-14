@@ -7,6 +7,7 @@ import { ConversationChannelPageStyle } from '../../utils/styles';
 import { MessagePanel } from '../../components/messages/MessagePanel';
 import { editGroupMessage, fetchGroupMessagesThunk } from '../../store/groupMessageSlice';
 import { GroupMessageType } from '../../utils/types';
+import { GroupRecipientsSidebar } from '../../components/sidebars/GroupRecipientsSidebar';
 
 export const GroupChannelPage = () => {
   const { id } = useParams();
@@ -37,11 +38,14 @@ export const GroupChannelPage = () => {
   const sendTypingStatus = () => {};
 
   return (
-    <ConversationChannelPageStyle>
-      <MessagePanel
-        sendTypingStatus={sendTypingStatus}
-        isRecipientTyping={isRecipientTyping}
-      ></MessagePanel>
-    </ConversationChannelPageStyle>
+    <>
+      <ConversationChannelPageStyle>
+        <MessagePanel
+          sendTypingStatus={sendTypingStatus}
+          isRecipientTyping={isRecipientTyping}
+        ></MessagePanel>
+      </ConversationChannelPageStyle>
+      <GroupRecipientsSidebar />
+    </>
   )
 }
