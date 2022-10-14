@@ -2,7 +2,6 @@ import { deleteMessage as deleteMessageAPI, editMessage as editMessageAPI, getCo
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ConversationMessage, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, MessageEventPayload, MessageType } from './../utils/types';
 import { RootState } from '.';
-import { sassTrue } from 'sass';
 
 export interface MessageState {
   messages: ConversationMessage[];
@@ -88,15 +87,16 @@ export const messagesSlice = createSlice({
         }
       })
       .addCase(deleteMessageThunk.fulfilled, (state, action) => {
-        const { data } = action.payload;
-        const conversationMessages = state.messages.find(
-          (cm) => cm.id === data.conversationId
-        );
-        if (!conversationMessages) return;
-        const messageIndex = conversationMessages.messages.findIndex(
-          (m) => m.id === data.messageId
-        );
-        conversationMessages?.messages.splice(messageIndex, 1);
+        console.log('deleteMessageThunk.fulfilled', state, action)
+        // const { data } = action.payload;
+        // const conversationMessages = state.messages.find(
+        //   (cm) => cm.id === data.conversationId
+        // );
+        // if (!conversationMessages) return;
+        // const messageIndex = conversationMessages.messages.findIndex(
+        //   (m) => m.id === data.messageId
+        // );
+        // conversationMessages?.messages.splice(messageIndex, 1);
       })
       .addCase(editMessageThunk.fulfilled, (state, action) => {
         console.log('editMessageThunk.fulfilled');
