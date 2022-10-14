@@ -1,3 +1,4 @@
+import { PersonAdd } from 'akar-icons';
 import { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -24,5 +25,12 @@ export const MessagePanelHeader = () => {
       : `${conversation?.creator.firstName} ${conversation?.creator.lastName}`;
   const groupName = group?.title || 'Group';
   const headerTitle = type === 'group' ? groupName : displayName;
-  return <MessagePanelHeaderStyle>{headerTitle}</MessagePanelHeaderStyle>;
+  return (
+    <MessagePanelHeaderStyle>
+      <div>
+        <span>{headerTitle}</span>
+      </div>
+      {type === 'group' && <PersonAdd size={30} />}
+    </MessagePanelHeaderStyle>
+  );
 }

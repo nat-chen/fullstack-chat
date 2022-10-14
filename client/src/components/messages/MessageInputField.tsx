@@ -5,12 +5,14 @@ import styles from './index.module.scss';
 type Props = {
   content: string;
   setContent: Dispatch<SetStateAction<string>>;
+  placeholderName: string;
   sendMessage: (e: React.FormEvent<HTMLFormElement>) => void;
   sendTypingStatus: () => void;
 }
 
 export const MessageInputField:FC<Props> = ({
   content,
+  placeholderName,
   setContent,
   sendMessage,
   sendTypingStatus,
@@ -24,6 +26,7 @@ export const MessageInputField:FC<Props> = ({
             value={content}
             onChange={updateContent}
             onKeyDown={sendTypingStatus}
+            placeholder={`Send a message to ${placeholderName}`}
           />
         </form>
       </MessageInputContainer>
