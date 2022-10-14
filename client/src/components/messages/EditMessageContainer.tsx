@@ -1,9 +1,11 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../store';
+import { editGroupMessageThunk } from '../../store/groupMessageSlice';
 import { setIsEditing } from '../../store/messageContainerSlice';
 import { editMessageThunk } from '../../store/messageSlice';
+import { selectType } from '../../store/selectedSlice';
 import { EditMessageActionsContainer, EditMessageInputField } from '../../utils/styles';
 import { EditMessagePayload } from '../../utils/types';
 
@@ -17,6 +19,7 @@ export const EditMessageContainer: FC<Props> = ({ onEditMessageChange }) => {
   const { messageBeingEdited } = useSelector(
     (state: RootState) => state.messageContainer
   );
+  const conversationType = useSelector((state: RootState) => selectType(state));
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(messageBeingEdited);
@@ -26,11 +29,19 @@ export const EditMessageContainer: FC<Props> = ({ onEditMessageChange }) => {
       return;
     }
     const params: EditMessagePayload = {
-      conversationId: parseInt(id!),
+      id: parseInt(id!),
       messageId: messageBeingEdited.id,
       content: messageBeingEdited.content,
     };
-    dispatch(editMessageThunk(params)).finally(() => dispatch(setIsEditing(false)));
+    console.log(params);
+    console.log('Editing...', conversationType);
+    conversationType === 'private'
+      ? dispatch(editMessageThunk(params)).finally(() =>
+          dispatch(setIsEditing(false))
+        )
+      : dispatch(editGroupMessageThunk(params)).finally(() =>
+          dispatch(setIsEditing(false))
+        );
   }
   return (
     <div style={{ width: '100%' }}>
