@@ -62,6 +62,7 @@ export type MessageEventPayload = {
 }
 
 export type CreateMessageParams = {
+  id: number;
   content: string;
 };
 

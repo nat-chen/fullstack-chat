@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { RootState } from '../../store';
 import { selectConversationById } from '../../store/conversationSlice';
-import { postNewMessage } from '../../utils/api';
+import { postGroupMessage, postNewMessage } from '../../utils/api';
 import { AuthContext } from '../../utils/context/AuthContext';
 import { getRecipientFromConversation } from '../../utils/helpers';
 import { MessagePanelBody, MessagePanelStyle, MessageTypingStatus } from '../../utils/styles';
@@ -18,25 +18,26 @@ type Props = {
 
 export const MessagePanel: FC<Props> = ({ sendTypingStatus, isRecipientTyping }) => {
   const [content, setContent] = useState('');
-  const { id } = useParams();
+  const { id: routeId } = useParams();
   const { user } = useContext(AuthContext);
-  const conversation = useSelector((state: RootState) => selectConversationById(state, parseInt(id!)));
+  const conversation = useSelector((state: RootState) => selectConversationById(state, parseInt(routeId!)));
+  const selectedType = useSelector(
+    (state: RootState) => state.selectedConversationType.type
+  );
   const recipient = getRecipientFromConversation(conversation, user);
   const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.preventDefault();
-    console.log(id);
-    console.log('Sending Message', content);
-    if (!id || !content) return;
-    const conversationId = parseInt(id);
-    try {
-      await postNewMessage(
-        conversationId,
-        { content }
-      );
-      setContent('');
-    } catch (err) {
-      console.log(err);
+    if (!routeId || !content) return;
+    const id = parseInt(routeId);
+    const params = { id, content };
+    if (selectedType === 'private') {
+      return postNewMessage(params)
+        .then(() => setContent(''))
+        .catch((err) => console.log(err));
+    } else {
+      return postGroupMessage(params)
+        .then(() => setContent(''))
+        .catch((err) => console.log(err));
     }
   }
   return (
