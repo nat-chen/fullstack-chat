@@ -12,9 +12,10 @@ import {
   InputField,
   InputLabel,
   RecipientResultContainer,
+  RecipientResultItem,
   TextField,
 } from '../../utils/styles';
-import { ConversationType, CreateConversationParams } from '../../utils/types';
+import { ConversationType, CreateConversationParams, User } from '../../utils/types';
 import styles from './index.module.scss';
 
 type Props = {
@@ -28,9 +29,10 @@ export const CreateConversationForm: FC<Props> = ({ setShowModal, type }) => {
     formState: { errors },
   } = useForm<CreateConversationParams>({});
   const [query, setQuery] = useState('');
-  const [userResults, setUserResults] = useState('');
-  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState('');
+  const [userResults, setUserResults] = useState<User[]>([]);
   const [searching, setSearching] = useState(false);
+  const [message, setMessage] = useState('');
   const debouncedQuery = useDebounce(query, 1000);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -41,7 +43,7 @@ export const CreateConversationForm: FC<Props> = ({ setShowModal, type }) => {
       searchUsers(debouncedQuery)
         .then(({ data }) => {
           console.log(data);
-          // setUserResults(data);
+          setUserResults(data);
         })
         .catch((err) => console.log(err))
         .finally(() => setSearching(false));
@@ -67,7 +69,15 @@ export const CreateConversationForm: FC<Props> = ({ setShowModal, type }) => {
           <InputField onChange={(e) => setQuery(e.target.value)} />
         </InputContainer>
       </section>
-      <RecipientResultContainer>asdd</RecipientResultContainer>
+      {!searching && userResults.length > 0 && query && (
+        <RecipientResultContainer>
+          {userResults.map((user) => (
+            <RecipientResultItem>
+              <span>{user.email}</span>
+            </RecipientResultItem>
+          ))}
+        </RecipientResultContainer>
+      )}
       <section className={styles.message}>
         <InputContainer backgroundColor="#161616">
           <InputLabel>Message (optional)</InputLabel>
