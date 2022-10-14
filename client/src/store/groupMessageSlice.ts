@@ -5,7 +5,7 @@ import {
   fetchGroupMessages as fetchGroupMessagesAPI,
   editGroupMessage as editGroupMessageAPI,
 } from '../utils/api';
-import { DeleteGroupMessageParams, EditMessagePayload, GroupMessage, GroupMessageEventPayload } from '../utils/types';
+import { DeleteGroupMessageParams, EditMessagePayload, GroupMessage, GroupMessageEventPayload, GroupMessageType } from '../utils/types';
 
 export interface GroupMessageSlice {
   messages: GroupMessage[];
@@ -41,6 +41,19 @@ export const groupMessagesSlice = createSlice({
       const { group, message } = action.payload;
       const groupMessage = state.messages.find((gm) => gm.id === group.id);
       groupMessage?.messages.unshift(message);
+    },
+    editGroupMessage: (state, action: PayloadAction<GroupMessageType>) => {
+      console.log('editGroupMessageThunk.fulfilled');
+      const { payload } = action;
+      const { id } = payload.group;
+      const groupMessage = state.messages.find((gm) => gm.id === id);
+      if (!groupMessage) return;
+      const messageIndex = groupMessage.messages.findIndex(
+        (m) => m.id === payload.id
+      );
+      console.log(messageIndex);
+      groupMessage.messages[messageIndex] = payload;
+      console.log('Updated Message');
     }
   },
   extraReducers: (builder) => {
@@ -70,19 +83,6 @@ export const groupMessagesSlice = createSlice({
       );
       groupMessages?.messages.splice(messageIndex, 1);
     })
-    .addCase(editGroupMessageThunk.fulfilled, (state, action) => {
-      console.log('editGroupMessageThunk.fulfilled');
-      const { data: message } = action.payload;
-      const { id } = message.group;
-      const groupMessage = state.messages.find((gm) => gm.id === id);
-      if (!groupMessage) return;
-      const messageIndex = groupMessage.messages.findIndex(
-        (m) => m.id === message.id
-      );
-      console.log(messageIndex);
-      groupMessage.messages[messageIndex] = message;
-      console.log('Updated Message');
-    });
   }
 });
 
@@ -94,6 +94,6 @@ export const selectGroupMessage = createSelector(
   (groupMessages, id) => groupMessages.find((gm) => gm.id === id)
 );
 
-export const { addGroupMessage } = groupMessagesSlice.actions;
+export const { addGroupMessage, editGroupMessage } = groupMessagesSlice.actions;
 
 export default groupMessagesSlice.reducer;
