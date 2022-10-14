@@ -6,7 +6,7 @@ import { selectConversationById } from '../../store/conversationSlice';
 import { postGroupMessage, postNewMessage } from '../../utils/api';
 import { AuthContext } from '../../utils/context/AuthContext';
 import { getRecipientFromConversation } from '../../utils/helpers';
-import { MessagePanelBody, MessagePanelStyle, MessageTypingStatus } from '../../utils/styles';
+import { MessagePanelBody, MessagePanelFooter, MessagePanelStyle, MessageTypingStatus } from '../../utils/styles';
 import { MessageContainer } from './MessageContainer';
 import { MessageInputField } from './MessageInputField';
 import { MessagePanelHeader } from './MessagePanelHeader';
@@ -46,18 +46,18 @@ export const MessagePanel: FC<Props> = ({ sendTypingStatus, isRecipientTyping })
       <MessagePanelStyle>
         <MessagePanelBody>
           <MessageContainer />
-          <div>
-            <MessageInputField
-              content={content}
-              setContent={setContent}
-              sendMessage={sendMessage}
-              sendTypingStatus={sendTypingStatus}
-            />
-            <MessageTypingStatus>
+        </MessagePanelBody>{' '}
+        <MessagePanelFooter>
+          <MessageInputField
+            content={content}
+            setContent={setContent}
+            sendMessage={sendMessage}
+            sendTypingStatus={sendTypingStatus}
+          />
+          <MessageTypingStatus>
             {isRecipientTyping ? `${recipient?.firstName} is typing...` : ''}
-            </MessageTypingStatus>
-          </div>
-        </MessagePanelBody>
+          </MessageTypingStatus>
+        </MessagePanelFooter>
       </MessagePanelStyle>
     </>
   )

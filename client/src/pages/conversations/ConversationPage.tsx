@@ -2,13 +2,12 @@ import { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Outlet, useParams } from 'react-router-dom';
 import { ConversationPanel } from '../../components/conversations/ConversationPanel';
-import { ConversationSidebar } from '../../components/conversations/ConversationSidebar';
+import { ConversationSidebar } from '../../components/sidebars/ConversationSidebar';
 import { AppDispatch } from '../../store';
 import { addConversation, fetchConversationsThunk, updateConversation } from '../../store/conversationSlice';
 import { addMessage, deleteMessage } from '../../store/messageSlice';
 import { updateType } from '../../store/selectedSlice';
 import { SocketContext } from '../../utils/context/SocketContext';
-import { Page } from '../../utils/styles';
 import { Conversation, MessageEventPayload } from '../../utils/types';
 
 export const ConversationPage = () => {
@@ -48,9 +47,10 @@ export const ConversationPage = () => {
   }, [id]);
 
   return (
-    <Page>
+    <>
+      <ConversationSidebar />
       {!id && <ConversationPanel />}
       <Outlet />
-    </Page>
+    </>
   )
 }

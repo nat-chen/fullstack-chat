@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { RootState } from '../../store'
-import { ConversationSearchbar, ConversationSidebarHeaderStyle, ConversationSidebarStyles, SidebarContainerStyle } from '../../utils/styles';
+import { ConversationSearchbar, ConversationSidebarHeader, ConversationSidebarStyle, ConversationsScrollableContainer, SidebarContainerStyle } from '../../utils/styles';
 import { ConversationSidebarItem } from '../conversations/ConversationSidebarItem';
 import { ConversationTab } from '../conversations/ConversationTab';
 import { GroupSidebarItem } from '../groups/GroupSidebarItem';
@@ -14,12 +14,12 @@ export const ConversationSidebar = () => {
     (state: RootState) => state.selectedConversationType.type
   );
   return (
-    <ConversationSidebarStyles>
-      <ConversationSidebarHeaderStyle>
-        <ConversationSearchbar placeholder="Search for Conversations..." />
-        <ConversationTab />
-      </ConversationSidebarHeaderStyle>
-      <div style={{ marginTop: '160px' }}>
+    <ConversationSidebarStyle>
+      <ConversationSidebarHeader>
+        <ConversationSearchbar placeholder="Search for Conversations" />
+      </ConversationSidebarHeader>
+      <ConversationTab />
+      <ConversationsScrollableContainer>
         <SidebarContainerStyle>
           {selectedConversationType === 'private'
             ? conversations.map((conversation) => (
@@ -32,7 +32,8 @@ export const ConversationSidebar = () => {
                 <GroupSidebarItem key={group.id} group={group} />
               ))}
         </SidebarContainerStyle>
-      </div>
-    </ConversationSidebarStyles>
+      </ConversationsScrollableContainer>
+      <footer></footer>
+    </ConversationSidebarStyle>
   )
 }
