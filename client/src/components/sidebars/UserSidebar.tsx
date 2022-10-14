@@ -1,5 +1,5 @@
-import { ArrowCycle, ChatAdd, ChatDots, Person, SignOut } from 'akar-icons';
-import { UserAvatar, UserSidebarBottom, UserSidebarItem, UserSidebarStyle, UserSidebarTop, UserSidebarTopIcons } from '../../utils/styles';
+import { ArrowCycle, ChatDots, Person } from 'akar-icons';
+import { UserAvatar, UserSidebarItem, UserSidebarStyle } from '../../utils/styles';
 import styles from './index.module.scss';
 import avatar from '../../__assets__/avatar_1.png';
 import { CreateConversationModal } from '../modals/CreateConversationModal';
