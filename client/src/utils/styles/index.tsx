@@ -526,6 +526,7 @@ export const ConversationSidebarStyle = styled.div`
   height: 100%;
   width: 400px;
   background-color: #111111;
+  flex: 0 0 auto;
 `;
 
 export const ConversationSidebarHeader = styled.header`
@@ -585,7 +586,7 @@ export const GroupRecipientsSidebarStyle = styled.aside`
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 500px;
+  width: 350;
   background-color: #111111;
 `;
 
