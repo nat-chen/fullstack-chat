@@ -175,8 +175,7 @@ export const MessagePanelHeaderStyle = styled.header`
   box-sizing: border-box;
   width: 100%;
   flex-shrink: 0;
-  border-bottom: 1px solid #22222256;
-  box-shadow: 5px 0 5px 1px #000;
+  border-bottom: 1px solid #49494925;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -586,9 +585,8 @@ export const GroupRecipientsSidebarStyle = styled.aside`
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 400px;
-  background-color: #141414;
-  border-left: 1px solid #22222256;
+  width: 500px;
+  background-color: #111111;
 `;
 
 export const GroupRecipientsSidebarHeader = styled.div`
@@ -597,8 +595,7 @@ export const GroupRecipientsSidebarHeader = styled.div`
   box-sizing: border-box;
   width: 100%;
   flex-shrink: 0;
-  border-bottom: 1px solid #22222256;
-  box-shadow: 5px 0 5px 1px #000;
+  border-bottom: 1px solid #49494925;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -609,7 +606,7 @@ export const GroupRecipientsSidebarHeader = styled.div`
 `;
 
 export const GroupRecipientSidebarItemContainer = styled.div`
-  padding: 10px 0 0 20px;
+  padding: 30px 0 0 30px;
   flex: 1 1 auto;
   overflow-y: auto;
   min-height: 0;
@@ -625,4 +622,10 @@ export const GroupRecipientSidebarItem = styled.div`
   font-size: 18px;
   font-weight: 500;
   margin: 10px 0;
+`;
+
+export const GroupHeaderIcons = styled.div`
+  display: flex;
+  gap: 20px;
+  align-items: center;
 `;
