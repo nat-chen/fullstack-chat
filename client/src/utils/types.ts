@@ -133,3 +133,8 @@ export type CreateGroupParams = {
   users: string[];
   title: string;
 };
+
+export type AddGroupRecipientParams = {
+  id: number;
+  email: string;
+}

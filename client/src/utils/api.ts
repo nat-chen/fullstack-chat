@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Group, GroupMessageType, MessageType, User, UserCredentialsParams } from './types'
+import { AddGroupRecipientParams, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Group, GroupMessageType, MessageType, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const axiosClient = axios.create({ baseURL: API_URL });
@@ -80,3 +80,6 @@ export const editGroupMessage = ({
     { content },
     config
   );
+
+export const addGroupRecipient = ({ id, email }: AddGroupRecipientParams) =>
+  axiosClient.post(`/groups/${id}/recipients`, { email }, config);
