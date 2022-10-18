@@ -188,4 +188,11 @@ export class MessagingGateway implements OnGatewayConnection {
       socket && socket.emit('onGroupCreate', payload);
     });
   }
+
+  @OnEvent('group.message.update')
+  handleGroupMessageUpdate(payload: GroupMessage) {
+    const room = `group-${payload.group.id}`;
+    console.log(room);
+    this.server.to(room).emit('onGroupMessageUpdate', payload);
+  }
 }
