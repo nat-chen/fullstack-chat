@@ -1,3 +1,4 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -9,11 +10,17 @@ import { IGroupService } from './group';
 export class GroupController {
   constructor(
     @Inject(Services.GROUPS) private readonly groupService: IGroupService,
+    private eventEmiter: EventEmitter2,
   ) {}
 
   @Post()
   async createGroup(@AuthUser() user: User, @Body() payload: CreateGroupDto) {
-    return this.groupService.createGroup({ ...payload, creator: user });
+    const group = await this.groupService.createGroup({
+      ...payload,
+      creator: user,
+    });
+    this.eventEmiter.emit('group.create', group);
+    return group;
   }
 
   @Get()

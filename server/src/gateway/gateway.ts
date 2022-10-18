@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { Services } from 'src/utils/constants';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Message, Conversation } from 'src/utils/typeorm';
+import { Message, Conversation, Group } from 'src/utils/typeorm';
 import {
   CreateGroupMessageResponse,
   CreateMessageResponse,
@@ -178,5 +178,14 @@ export class MessagingGateway implements OnGatewayConnection {
     const { id } = payload.group;
     console.log('Inside group.message.create');
     this.server.to(`group-${id}`).emit('onGroupMessage', payload);
+  }
+
+  @OnEvent('group.create')
+  handleGroupCreate(payload: Group) {
+    console.log('group.create event');
+    payload.users.forEach((user) => {
+      const socket = this.sessions.getUserSocket(user.id);
+      socket && socket.emit('onGroupCreate', payload);
+    });
   }
 }
