@@ -17,6 +17,7 @@ import { GroupChannelPage } from './pages/group/GroupChannelPage';
 import { AppPage } from './pages/AppPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ConversationPageGuard } from './guards/ConversationPageGuard';
 
 enableMapSet();
 
@@ -49,15 +50,14 @@ function App() {
       <Routes>
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route
-          element={
-            <AuthenticatedRoute>
-              <AppPage />
-            </AuthenticatedRoute>
-          }
-        >
+        <Route element={ <AuthenticatedRoute children={<AppPage />} />}>
           <Route path="conversations" element={<ConversationPage />}>
-            <Route path=":id" element={<ConversationChannelPage />} />
+            <Route
+              path=":id"
+              element={
+                <ConversationPageGuard children={<ConversationChannelPage />} />
+              }
+            />
           </Route>
           <Route path="groups" element={<GroupPage />}>
             <Route path=":id" element={<GroupChannelPage />} />
