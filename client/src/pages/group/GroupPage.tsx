@@ -5,7 +5,7 @@ import { ConversationPanel } from '../../components/conversations/ConversationPa
 import { ConversationSidebar } from '../../components/sidebars/ConversationSidebar';
 import { AppDispatch } from '../../store';
 import { addGroupMessage } from '../../store/groupMessageSlice';
-import { addGroup, fetchGroupsThunk, updateGroup } from '../../store/groupSlice';
+import { addGroup, fetchGroupsThunk, removeGroup, updateGroup } from '../../store/groupSlice';
 import { updateType } from '../../store/selectedSlice';
 import { AuthContext } from '../../utils/context/AuthContext';
 import { socket, SocketContext } from '../../utils/context/SocketContext';
@@ -48,25 +48,29 @@ export const GroupPage = () => {
     });
 
     socket.on(
-      'onGroupRemovedUser',
+      'onGroupRecipientRemoved',
       (payload: RemoveGroupUserMessagePayload) => {
-        console.log('onGroupRemovedUser');
+        console.log('onGroupRecipientRemoved');
         console.log(payload);
         dispatch(updateGroup(payload.group));
-        if (payload.user.id === user?.id) {
-          console.log('user is logged in was removed from the group');
-          console.log('navigating...');
-          navigate('/groups');
-        }
       }
-    )
+    );
+
+    socket.on('onGroupRemoved', (payload: RemoveGroupUserMessagePayload) => {
+      console.log('onGroupRemoved');
+      console.log('user is logged in was removed from the group');
+      console.log('navigating...');
+      navigate('/groups');
+      dispatch(removeGroup(payload.group));
+    });
 
     return () => {
-      socket.off('onGroupMessage');
-      socket.off('onGroupCreate');
-      socket.off('onGroupUserAdd');
-      socket.off('onGroupReceivedNewUser');
-      socket.off('onGroupRemoveUser');
+      socket.removeAllListeners();
+      // socket.off('onGroupMessage');
+      // socket.off('onGroupCreate');
+      // socket.off('onGroupUserAdd');
+      // socket.off('onGroupReceivedNewUser');
+      // socket.off('onGroupRemoveUser');
     }
   })
 
