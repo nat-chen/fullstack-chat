@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { Services } from 'src/utils/constants';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
-import { Message, Conversation, Group } from 'src/utils/typeorm';
+import { Message, Conversation, Group, GroupMessage } from 'src/utils/typeorm';
 import {
   CreateGroupMessageResponse,
   CreateMessageResponse,
