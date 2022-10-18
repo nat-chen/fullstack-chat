@@ -5,7 +5,7 @@ import { ConversationPanel } from '../../components/conversations/ConversationPa
 import { ConversationSidebar } from '../../components/sidebars/ConversationSidebar';
 import { AppDispatch } from '../../store';
 import { addGroupMessage } from '../../store/groupMessageSlice';
-import { addGroup, fetchGroupsThunk } from '../../store/groupSlice';
+import { addGroup, fetchGroupsThunk, updateGroup } from '../../store/groupSlice';
 import { updateType } from '../../store/selectedSlice';
 import { socket } from '../../utils/context/SocketContext';
 import { AddGroupUserMessagePayload, GroupMessageEventPayload } from '../../utils/types';
@@ -36,12 +36,18 @@ export const GroupPage = () => {
       console.log('onGroupUserAdd');
       console.log(payload);
       dispatch(addGroup(payload.group));
+    });
+
+    socket.on('onGroupReceivedNewUser', (payload: AddGroupUserMessagePayload) => {
+      console.log('Received onGroupReceivedNewUser');
+      dispatch(updateGroup(payload.group));
     })
 
     return () => {
       socket.off('onGroupMessage');
       socket.off('onGroupCreate');
       socket.off('onGroupUserAdd');
+      socket.off('onGroupReceivedNewUser');
     }
   })
 

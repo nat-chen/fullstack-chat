@@ -7,7 +7,7 @@ import { selectGroupById } from '../../store/groupSlice';
 import { SocketContext } from '../../utils/context/SocketContext';
 import { GroupRecipientSidebarItem, GroupRecipientSidebarItemContainer, GroupRecipientsSidebarHeader, GroupRecipientsSidebarStyle, MessageItemAvatar } from '../../utils/styles';
 import { User } from '../../utils/types';
-import { SelectedParticipantContextMenu } from '../context-menus/selectedParticipantContextMenu';
+import { SelectedParticipantContextMenu } from '../context-menus/SelectedParticipantContextMenu';
 
 export const GroupRecipientsSidebar = () => {
   const { id: groupId } = useParams();
@@ -26,13 +26,9 @@ export const GroupRecipientsSidebar = () => {
   useEffect(() => {
     socket.emit('getOnlineGroupUsers', { groupId });
     const interval = setInterval(() => {
-      console.log(`Pinging Group ${groupId}`);
       socket.emit('getOnlineGroupUsers', { groupId });
-    }, 10000);
+    }, 12000);
     socket.on('onlineGroupUsersReceived', (payload) => {
-      console.log('received payload for online users');
-      console.log(payload);
-      console.log(group?.users);
       setOnlineUsers(payload.onlineUsers);
     });
     return () => {
