@@ -1,18 +1,22 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { ConversationPanel } from '../../components/conversations/ConversationPanel';
 import { ConversationSidebar } from '../../components/sidebars/ConversationSidebar';
 import { AppDispatch } from '../../store';
 import { addGroupMessage } from '../../store/groupMessageSlice';
 import { addGroup, fetchGroupsThunk, updateGroup } from '../../store/groupSlice';
 import { updateType } from '../../store/selectedSlice';
-import { socket } from '../../utils/context/SocketContext';
-import { AddGroupUserMessagePayload, GroupMessageEventPayload } from '../../utils/types';
+import { AuthContext } from '../../utils/context/AuthContext';
+import { socket, SocketContext } from '../../utils/context/SocketContext';
+import { AddGroupUserMessagePayload, GroupMessageEventPayload, RemoveGroupUserMessagePayload } from '../../utils/types';
 
 export const GroupPage = () => {
   const { id } = useParams();
+  const { user } = useContext(AuthContext);
   const dispatch = useDispatch<AppDispatch>();
+  const socket = useContext(SocketContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(updateType('group'));
@@ -41,13 +45,28 @@ export const GroupPage = () => {
     socket.on('onGroupReceivedNewUser', (payload: AddGroupUserMessagePayload) => {
       console.log('Received onGroupReceivedNewUser');
       dispatch(updateGroup(payload.group));
-    })
+    });
+
+    socket.on(
+      'onGroupRemovedUser',
+      (payload: RemoveGroupUserMessagePayload) => {
+        console.log('onGroupRemovedUser');
+        console.log(payload);
+        dispatch(updateGroup(payload.group));
+        if (payload.user.id === user?.id) {
+          console.log('user is logged in was removed from the group');
+          console.log('navigating...');
+          navigate('/groups');
+        }
+      }
+    )
 
     return () => {
       socket.off('onGroupMessage');
       socket.off('onGroupCreate');
       socket.off('onGroupUserAdd');
       socket.off('onGroupReceivedNewUser');
+      socket.off('onGroupRemoveUser');
     }
   })
 
