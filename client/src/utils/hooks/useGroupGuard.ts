@@ -1,0 +1,26 @@
+import { fetchGroupById } from './../api';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+export function useGroupGuard() {
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState()
+  const controller = new AbortController();
+
+  useEffect(() => {
+    console.log('Fetching group');
+    setLoading(true);
+    fetchGroupById(parseInt(id!))
+      .catch((err) => {
+        console.log(err);
+        setError(err);
+      })
+      .finally(() => setLoading(false));
+    return () => {
+      controller.abort();
+    }
+  }, [id]);
+
+  return { loading, error };
+}

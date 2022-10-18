@@ -18,6 +18,7 @@ import { AppPage } from './pages/AppPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ConversationPageGuard } from './guards/ConversationPageGuard';
+import { GroupPageGuard } from './guards/GroupPageGuard';
 
 enableMapSet();
 
@@ -60,7 +61,10 @@ function App() {
             />
           </Route>
           <Route path="groups" element={<GroupPage />}>
-            <Route path=":id" element={<GroupChannelPage />} />
+            <Route
+              path=":id"
+              element={<GroupPageGuard children={<GroupChannelPage />} />}
+            />
           </Route>
         </Route>
       </Routes>
