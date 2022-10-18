@@ -19,7 +19,7 @@ import { TransferOwnerDto } from '../dtos/TransferOwnerDto';
 export class GroupController {
   constructor(
     @Inject(Services.GROUPS) private readonly groupService: IGroupService,
-    private eventEmiter: EventEmitter2,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
@@ -28,7 +28,7 @@ export class GroupController {
       ...payload,
       creator: user,
     });
-    this.eventEmiter.emit('group.create', group);
+    this.eventEmitter.emit('group.create', group);
     return group;
   }
 
@@ -43,12 +43,14 @@ export class GroupController {
   }
 
   @Patch(':id/owner')
-  updateGroupOwner(
+  async updateGroupOwner(
     @AuthUser() { id: userId }: User,
     @Param('id') groupId: number,
     @Body() { newOwnerId }: TransferOwnerDto,
   ) {
     const params = { userId, groupId, newOwnerId };
-    return this.groupService.transferGroupOwner(params);
+    const group = await this.groupService.transferGroupOwner(params);
+    this.eventEmitter.emit('group.owner.update', group);
+    return group;
   }
 }
