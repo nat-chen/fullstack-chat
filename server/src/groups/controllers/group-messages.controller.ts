@@ -1,4 +1,4 @@
-import { CreateMessageDto } from './../messages/dtos/CreateMessage.dto';
+import { CreateMessageDto } from '../../messages/dtos/CreateMessage.dto';
 import {
   Body,
   Controller,
@@ -13,7 +13,7 @@ import {
 import { AuthUser } from 'src/utils/decorators';
 import { Routes, Services } from 'src/utils/constants';
 import { User } from 'src/utils/typeorm';
-import { IGroupMessageService } from './group-messages';
+import { IGroupMessageService } from '../interfaces/group-messages';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EditMessageDto } from 'src/messages/dtos/EditMessage';
 

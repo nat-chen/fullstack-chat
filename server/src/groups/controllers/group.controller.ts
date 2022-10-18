@@ -3,8 +3,8 @@ import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
-import { CreateGroupDto } from './dtos/CreateGroup.dto';
-import { IGroupService } from './group';
+import { CreateGroupDto } from '../dtos/CreateGroup.dto';
+import { IGroupService } from '../interfaces/group';
 
 @Controller(Routes.GROUPS)
 export class GroupController {

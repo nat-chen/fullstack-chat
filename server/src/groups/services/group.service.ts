@@ -2,7 +2,7 @@ import { IUserService } from 'src/users/user';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from 'src/utils/typeorm';
-import { IGroupService } from './group';
+import { IGroupService } from '../interfaces/group';
 import { Services } from 'src/utils/constants';
 import { Repository } from 'typeorm';
 import { CreateGroupParams, FetchGroupsParams } from 'src/utils/types';

@@ -1,5 +1,4 @@
-import { IGroupService } from 'src/groups/group';
-import { GroupService } from './../groups/group.service';
+import { IGroupService } from 'src/groups/interfaces/group';
 import { IGatewaySessionManager } from './gateway.session';
 import { Inject } from '@nestjs/common';
 import {
