@@ -10,6 +10,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Throttle } from '@nestjs/throttler';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
@@ -24,6 +25,7 @@ export class MessageController {
     private eventEmitter: EventEmitter2,
   ) {}
 
+  @Throttle(5, 10)
   @Post()
   async createMessage(
     @AuthUser() user: User,
