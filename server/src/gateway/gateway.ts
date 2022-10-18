@@ -1,3 +1,5 @@
+import { IGroupService } from 'src/groups/group';
+import { GroupService } from './../groups/group.service';
 import { IGatewaySessionManager } from './gateway.session';
 import { Inject } from '@nestjs/common';
 import {
@@ -7,6 +9,7 @@ import {
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Services } from 'src/utils/constants';
@@ -25,12 +28,16 @@ import { IConversationsService } from 'src/conversations/conversations';
     credentials: true,
   },
 })
-export class MessagingGateway implements OnGatewayConnection {
+export class MessagingGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(
     @Inject(Services.GATEWAY_SESSION_MANAGER)
     private readonly sessions: IGatewaySessionManager,
     @Inject(Services.CONVERSATIONS)
     private readonly conversationService: IConversationsService,
+    @Inject(Services.GROUPS)
+    private readonly GroupService: IGroupService,
   ) {}
 
   @WebSocketServer()
@@ -41,6 +48,32 @@ export class MessagingGateway implements OnGatewayConnection {
     console.log(socket.user);
     this.sessions.setUserSocket(socket.user.id, socket);
     socket.emit('connected', {});
+  }
+
+  handleDisconnect(socket: AuthenticatedSocket) {
+    console.log('handleDisconnect');
+    console.log(`${socket.user.email} disconnected.`);
+    this.sessions.removeUserSocket(socket.user.id);
+  }
+
+  @SubscribeMessage('getOnlineGroupUsers')
+  async handleGetOnlineGroupUsers(
+    @MessageBody() data: any,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('handleGetOnlineGroupUsers');
+    console.log(data);
+    const group = await this.GroupService.findGroupById(parseInt(data.groupId));
+    if (!group) return;
+    const onlineUsers = [];
+    const offlineUsers = [];
+    group.users.forEach((user) => {
+      const socket = this.sessions.getUserSocket(user.id);
+      socket ? onlineUsers.push(user) : offlineUsers.push(user);
+    });
+    console.log(onlineUsers);
+    console.log(offlineUsers);
+    socket.emit('onlineGroupUsersReceived', { onlineUsers, offlineUsers });
   }
 
   @SubscribeMessage('createMessage')
