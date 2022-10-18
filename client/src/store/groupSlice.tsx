@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '.';
-import { fetchGroups as fetchGroupsAPI, createGroup as createGroupAPI, } from '../utils/api';
-import { CreateGroupParams, Group } from '../utils/types';
+import { fetchGroups as fetchGroupsAPI, createGroup as createGroupAPI, removeGroupRecipient as removeGroupRecipientAPI } from '../utils/api';
+import { CreateGroupParams, Group, RemoveGroupRecipientParams } from '../utils/types';
 
 export interface GroupState {
   groups: Group[];
@@ -19,6 +19,11 @@ export const createGroupThunk = createAsyncThunk(
   'groups/create',
   (params: CreateGroupParams) => createGroupAPI(params)
 );
+
+export const removeGroupRecipientThunk = createAsyncThunk(
+  'groups/recipients/delete',
+  (params: RemoveGroupRecipientParams) => removeGroupRecipientAPI(params)
+)
 
 export const groupsSlice = createSlice({
   name: 'groups',
@@ -43,11 +48,24 @@ export const groupsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchGroupsThunk.fulfilled, (state, action) => {
-      console.log(action.payload.data);
-      state.groups = action.payload.data;
-      console.log(state.groups);
-    });
+    builder
+      .addCase(fetchGroupsThunk.fulfilled, (state, action) => {
+        console.log(action.payload.data);
+        state.groups = action.payload.data;
+        console.log(state.groups);
+      })
+      .addCase(removeGroupRecipientThunk.fulfilled, (state, action) => {
+        const { data: updatedGroup } = action.payload;
+        console.log('removeGroupRecipientThunk.fulfilled');
+        const existingGroup = state.groups.find(
+          (g) => g.id === updatedGroup.id
+        );
+        const index = state.groups.findIndex((g) => g.id === updatedGroup.id);
+        if (existingGroup) {
+          state.groups[index] = updatedGroup;
+          console.log('Updating Group....');
+        }
+      })
   }
 });
 

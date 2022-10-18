@@ -1,11 +1,11 @@
+import { Crown, Person, PersonCross } from 'akar-icons';
 import { FC, useContext } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { RootState } from '../../store';
-import { selectGroupById } from '../../store/groupSlice';
-import { userContextMenuItems } from '../../utils/constants';
+import { AppDispatch, RootState } from '../../store';
+import { removeGroupRecipientThunk, selectGroupById } from '../../store/groupSlice';
 import { AuthContext } from '../../utils/context/AuthContext';
-import { getUserContextMenuActions, getUserContextMenuIcon } from '../../utils/helpers';
+import { getUserContextMenuIcon, isGroupOwner } from '../../utils/helpers';
 import { ContextMenu, ContextMenuItem } from '../../utils/styles';
 import { UserContextMenuActionType } from '../../utils/types';
 
@@ -25,15 +25,38 @@ export const CustomIcon: FC<CustomIconProps> = ({ type }) => {
 export const SelectedParticipantContextMenu: FC<Props> = ({ points }) => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
+  const dispatch = useDispatch<AppDispatch>();
+  const selectedUser = useSelector((state: RootState) => state.groupSidebar.selectedUser);
   const group = useSelector((state: RootState) => selectGroupById(state, parseInt(id!)));
+  const kickUser = () => {
+    if (!selectedUser) return;
+    dispatch(
+      removeGroupRecipientThunk({
+        id: parseInt(id!),
+        userId: selectedUser.id,
+      })
+    );
+  };
+  const isOwner = isGroupOwner(user, group);
+
   return (
     <ContextMenu top={points.y} left={points.x}>
-      {getUserContextMenuActions(user, group).map((item) => (
-        <ContextMenuItem>
-          <CustomIcon type={item.action} />
-          <span style={{ color: item.color }}>{item.label}</span>
+      <ContextMenuItem>
+        <Person size={20} color="#7c7c7c" />
+        <span style={{ color: '#7c7c7c' }}>Profile</span>
+      </ContextMenuItem>
+      {isOwner && user?.id !== selectedUser?.id && (
+        <>
+        <ContextMenuItem onClick={kickUser}>
+          <PersonCross size={20} color="#ff0000" />
+          <span style={{ color: '#ff0000' }}>Kick User</span>
         </ContextMenuItem>
-      ))}
+        <ContextMenuItem>
+          <Crown size={20} color="#FFB800" />
+          <span style={{ color: '#FFB800' }}>Transfer Owner</span>
+        </ContextMenuItem>
+      </>
+      )}
     </ContextMenu>
   )
 }
