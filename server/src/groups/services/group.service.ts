@@ -1,3 +1,4 @@
+import { GroupOwnerTransferException } from './../exceptions/GroupOwnerTransfer';
 import { IUserService } from 'src/users/user';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,8 +10,10 @@ import {
   AccessParams,
   CreateGroupParams,
   FetchGroupsParams,
+  TransferOwnerParams,
 } from 'src/utils/types';
 import { GroupNotFoundException } from '../exceptions/GroupNotFound';
+import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
 
 @Injectable()
 export class GroupService implements IGroupService {
@@ -28,8 +31,8 @@ export class GroupService implements IGroupService {
     );
     const users = (await Promise.all(usersPromise)).filter((user) => user);
     users.push(creator);
-    console.log(users);
-    const group = this.groupRepository.create({ users, creator, title });
+    const groupParams = { owner: creator, users, creator, title };
+    const group = this.groupRepository.create(groupParams);
     return this.groupRepository.save(group);
   }
 
@@ -46,7 +49,7 @@ export class GroupService implements IGroupService {
   findGroupById(id: number): Promise<Group> {
     return this.groupRepository.findOne({
       where: { id },
-      relations: ['creator', 'users', 'lastMessageSent'],
+      relations: ['creator', 'users', 'lastMessageSent', 'owner'],
     });
   }
 
@@ -58,5 +61,26 @@ export class GroupService implements IGroupService {
     const group = await this.findGroupById(id);
     if (!group) throw new GroupNotFoundException();
     return group.users.find((user) => user.id === userId);
+  }
+
+  async transferGroupOwner({
+    userId,
+    groupId,
+    newOwnerId,
+  }: TransferOwnerParams): Promise<Group> {
+    const group = await this.findGroupById(groupId);
+    if (!group) throw new GroupNotFoundException();
+    if (group.owner.id !== userId) {
+      throw new GroupOwnerTransferException('Insufficient Permissions');
+    }
+    if (group.owner.id === newOwnerId) {
+      throw new GroupOwnerTransferException(
+        'Cannot Transfer Owner to yourself',
+      );
+    }
+    const newOwner = await this.userService.findUser({ id: newOwnerId });
+    if (!newOwner) throw new UserNotFoundException();
+    group.owner = newOwner;
+    return this.groupRepository.save(group);
   }
 }
