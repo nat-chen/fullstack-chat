@@ -1,3 +1,4 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   Body,
   Controller,
@@ -18,16 +19,19 @@ export class GroupRecipientsController {
   constructor(
     @Inject(Services.GROUP_RECIPIENTS)
     private readonly groupRecipientService: IGroupRecipientService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   @Post()
-  addGroupRecipient(
+  async addGroupRecipient(
     @AuthUser() { id: userId }: User,
     @Param('id', ParseIntPipe) id: number,
     @Body() { email }: AddGroupRecipientDto,
   ) {
     const params = { id, userId, email };
-    return this.groupRecipientService.addGroupRecipient(params);
+    const response = await this.groupRecipientService.addGroupRecipient(params);
+    this.eventEmitter.emit('group.user.add', response);
+    return response;
   }
 
   @Delete(':userId')

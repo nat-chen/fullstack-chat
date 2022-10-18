@@ -16,6 +16,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import { Message, Conversation, Group, GroupMessage } from 'src/utils/typeorm';
 import {
+  AddGroupUserResponse,
   CreateGroupMessageResponse,
   CreateMessageResponse,
 } from 'src/utils/types';
@@ -226,5 +227,11 @@ export class MessagingGateway
     const room = `group-${payload.group.id}`;
     console.log(room);
     this.server.to(room).emit('onGroupMessageUpdate', payload);
+  }
+
+  @OnEvent('group.user.add')
+  handleGroupUserAdd(payload: AddGroupUserResponse) {
+    const recipientSocket = this.sessions.getUserSocket(payload.user.id);
+    recipientSocket && recipientSocket.emit('onGroupUserAdd', payload);
   }
 }
