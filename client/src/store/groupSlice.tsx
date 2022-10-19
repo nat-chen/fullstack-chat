@@ -1,14 +1,19 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '.';
 import { fetchGroups as fetchGroupsAPI, createGroup as createGroupAPI, removeGroupRecipient as removeGroupRecipientAPI, updateGroupOwner as updateGroupOwnerAPI } from '../utils/api';
-import { CreateGroupParams, Group, RemoveGroupRecipientParams, UpdateGroupOwnerParams } from '../utils/types';
+import { CreateGroupParams, Group, Points, RemoveGroupRecipientParams, UpdateGroupOwnerParams } from '../utils/types';
 
 export interface GroupState {
   groups: Group[];
+  showGroupContextMenu: boolean;
+  selectedGroupContextMenu?: Group;
+  points: Points;
 }
 
 const initialState: GroupState = {
   groups: [],
+  showGroupContextMenu: false,
+  points: { x: 0, y: 0 },
 };
 
 export const fetchGroupsThunk = createAsyncThunk('group/fetch', () => {
@@ -58,6 +63,15 @@ export const groupsSlice = createSlice({
       if (!group) return;
       state.groups.splice(index, 1);
     },
+    toggleContextMenu: (state, action: PayloadAction<boolean>) => {
+      state.showGroupContextMenu = action.payload;
+    },
+    setSelectedGroup: (state, action: PayloadAction<Group>) => {
+      state.selectedGroupContextMenu = action.payload;
+    },
+    setContextMenuLocation: (state, action: PayloadAction<Points>) => {
+      state.points = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -92,6 +106,13 @@ export const selectGroupById = createSelector(
   (groups, groupId) => groups.find((g) => g.id === groupId)
 );
 
-export const { addGroup, updateGroup, removeGroup } = groupsSlice.actions;
+export const {
+  addGroup,
+  updateGroup,
+  removeGroup,
+  toggleContextMenu,
+  setContextMenuLocation,
+  setSelectedGroup,
+} = groupsSlice.actions;
 
 export default groupsSlice.reducer;
