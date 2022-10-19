@@ -9,7 +9,7 @@ import { addGroup, fetchGroupsThunk, removeGroup, updateGroup } from '../../stor
 import { updateType } from '../../store/selectedSlice';
 import { AuthContext } from '../../utils/context/AuthContext';
 import { socket, SocketContext } from '../../utils/context/SocketContext';
-import { AddGroupUserMessagePayload, GroupMessageEventPayload, RemoveGroupUserMessagePayload } from '../../utils/types';
+import { AddGroupUserMessagePayload, Group, GroupMessageEventPayload, RemoveGroupUserMessagePayload } from '../../utils/types';
 
 export const GroupPage = () => {
   const { id } = useParams();
@@ -66,6 +66,11 @@ export const GroupPage = () => {
         console.log('Navigating User to /groups');
         navigate('/groups');
       }
+    });
+
+    socket.on('onGroupOwnerUpdate', (payload: Group) => {
+      console.log('received onGroupOwnerUpdate');
+      dispatch(updateGroup(payload));
     });
 
     return () => {
