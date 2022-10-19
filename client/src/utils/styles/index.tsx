@@ -635,12 +635,3 @@ export const GroupHeaderIcons = styled.div`
   gap: 20px;
   align-items: center;
 `;
-
-export const TestContextMenu = styled.div<ContextMenuProps>`
-  ${({ top, left }) => css`
-    top: ${top}px;
-    left: ${left}px;
-  `}
-  width: 200px;
-  background-color: #000;
-`;
