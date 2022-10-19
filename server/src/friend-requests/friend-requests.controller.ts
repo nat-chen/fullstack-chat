@@ -7,6 +7,7 @@ import {
   Post,
   ParseIntPipe,
   Get,
+  Delete,
 } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -41,5 +42,13 @@ export class FriendRequestController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.friendRequestService.accept({ id, userId });
+  }
+
+  @Delete(':id/cancel')
+  cancelFriendRequest(
+    @AuthUser() { id: userId }: User,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.friendRequestService.cancel({ id, userId });
   }
 }
