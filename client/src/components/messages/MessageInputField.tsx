@@ -1,5 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import { MessageInput, MessageInputContainer } from '../../utils/styles';
+import { MessageTextField } from '../inputs/MessageTextField';
 import styles from './index.module.scss';
 
 type Props = {
@@ -17,17 +18,12 @@ export const MessageInputField:FC<Props> = ({
   sendMessage,
   sendTypingStatus,
 }) => {
-  const updateContent = (e: React.ChangeEvent<HTMLInputElement>) => setContent(e.target.value);
+  const updateContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value);
   return (
     <>
       <MessageInputContainer>
         <form onSubmit={sendMessage} className={styles.form}>
-          <MessageInput
-            value={content}
-            onChange={updateContent}
-            onKeyDown={sendTypingStatus}
-            placeholder={`Send a message to ${placeholderName}`}
-          />
+          <MessageTextField />
         </form>
       </MessageInputContainer>
     </>
