@@ -118,6 +118,7 @@ export type Group = {
   title?: string;
   users: User[];
   creator: User;
+  owner: User;
   messages: GroupMessageType[];
   createdAt: number;
   lastMessageSent: MessageType;

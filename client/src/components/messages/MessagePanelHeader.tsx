@@ -42,7 +42,7 @@ export const MessagePanelHeader = () => {
           <span>{headerTitle}</span>
         </div>
         <GroupHeaderIcons>
-          {type === 'group' && user?.id === group?.creator?.id && (
+          {type === 'group' && user?.id === group?.owner?.id && (
             <PersonAdd
               cursor="pointer"
               size={30}
