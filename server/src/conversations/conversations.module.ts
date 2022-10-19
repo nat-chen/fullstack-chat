@@ -1,4 +1,4 @@
-import { Conversation } from './../utils/typeorm';
+import { Conversation, Message } from './../utils/typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { Services } from '../utils/constants';
@@ -9,7 +9,7 @@ import { isAuthorized } from 'src/utils/helpers';
 import { ConversationMiddleware } from './middleware/conversation.middleware';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Conversation]), UsersModule],
+  imports: [TypeOrmModule.forFeature([Conversation, Message]), UsersModule],
   controllers: [ConversationsController],
   providers: [
     {
