@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   ParseIntPipe,
+  Get,
 } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
@@ -17,8 +18,13 @@ import { IFriendsRequestService } from './friend-requests';
 export class FriendRequestController {
   constructor(
     @Inject(Services.FRIENDS_REQUESTS_SERVICE)
-    private readonly FriendRequestService: IFriendsRequestService,
+    private readonly friendRequestService: IFriendsRequestService,
   ) {}
+
+  @Get()
+  getFriendRequests(@AuthUser() user: User) {
+    return this.friendRequestService.getFriendRequests(user.id);
+  }
 
   @Post()
   createFriendRequest(
@@ -26,7 +32,7 @@ export class FriendRequestController {
     @Body() { email }: CreateFriendDto,
   ) {
     const params = { user, email };
-    return this.FriendRequestService.create(params);
+    return this.friendRequestService.create(params);
   }
 
   @Patch(':id/accept')
@@ -34,6 +40,6 @@ export class FriendRequestController {
     @AuthUser() { id: userId }: User,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.FriendRequestService.accept({ id, userId });
+    return this.friendRequestService.accept({ id, userId });
   }
 }
