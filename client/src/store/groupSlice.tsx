@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '.';
-import { fetchGroups as fetchGroupsAPI, createGroup as createGroupAPI, removeGroupRecipient as removeGroupRecipientAPI } from '../utils/api';
-import { CreateGroupParams, Group, RemoveGroupRecipientParams } from '../utils/types';
+import { fetchGroups as fetchGroupsAPI, createGroup as createGroupAPI, removeGroupRecipient as removeGroupRecipientAPI, updateGroupOwner as updateGroupOwnerAPI } from '../utils/api';
+import { CreateGroupParams, Group, RemoveGroupRecipientParams, UpdateGroupOwnerParams } from '../utils/types';
 
 export interface GroupState {
   groups: Group[];
@@ -24,6 +24,11 @@ export const removeGroupRecipientThunk = createAsyncThunk(
   'groups/recipients/delete',
   (params: RemoveGroupRecipientParams) => removeGroupRecipientAPI(params)
 )
+
+export const updateGroupOwnerThunk = createAsyncThunk(
+  'groups/owner/update',
+  (params: UpdateGroupOwnerParams) => updateGroupOwnerAPI(params)
+);
 
 export const groupsSlice = createSlice({
   name: 'groups',
@@ -73,6 +78,9 @@ export const groupsSlice = createSlice({
           console.log('Updating Group....');
         }
       })
+      .addCase(updateGroupOwnerThunk.fulfilled, (state, action) => {
+        console.log('updateGroupOwnerThunk.fulfilled');
+      });
   }
 });
 

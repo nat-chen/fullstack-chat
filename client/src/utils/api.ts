@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { AddGroupRecipientParams, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, User, UserCredentialsParams } from './types'
+import { AddGroupRecipientParams, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const axiosClient = axios.create({ baseURL: API_URL });
@@ -95,3 +95,6 @@ export const removeGroupRecipient = ({
   userId,
 }: RemoveGroupRecipientParams) =>
   axiosClient.delete<Group>(`/groups/${id}/recipients/${userId}`, config);
+
+export const updateGroupOwner = ({ id, newOwnerId }: UpdateGroupOwnerParams) =>
+  axiosClient.patch(`/groups/${id}/owner`, { newOwnerId }, config);
