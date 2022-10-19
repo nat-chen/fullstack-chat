@@ -261,7 +261,13 @@ export class MessagingGateway
   @OnEvent('group.owner.update')
   handleGroupOwnerUpdate(payload: Group) {
     const ROOM_NAME = `group-${payload.id}`;
-    console.log('Inside group.owner.update');
+    const newOwnerSocket = this.sessions.getUserSocket(payload.owner.id);
+    const { rooms } = this.server.sockets.adapter;
+    const socketsInRoom = rooms.get(ROOM_NAME);
     this.server.to(ROOM_NAME).emit('onGroupOwnerUpdate', payload);
+    if (newOwnerSocket && !socketsInRoom.has(newOwnerSocket.id)) {
+      console.log('The new owner is not in the room...');
+      newOwnerSocket.emit('onGroupOwnerUpdate', payload);
+    }
   }
 }
