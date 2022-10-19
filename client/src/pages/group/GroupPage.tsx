@@ -68,6 +68,16 @@ export const GroupPage = () => {
       }
     });
 
+    socket.on('onGroupParticipantLeft', (payload) => {
+      console.log('onGroupParticipantLeft received');
+      console.log(payload);
+      dispatch(updateGroup(payload.group));
+      if (payload.userId === user?.id) {
+        console.log('payload.userId matches user.id...');
+        navigate('/groups');
+      }
+    });
+
     socket.on('onGroupOwnerUpdate', (payload: Group) => {
       console.log('received onGroupOwnerUpdate');
       dispatch(updateGroup(payload));
