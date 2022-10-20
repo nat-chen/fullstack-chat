@@ -30,4 +30,22 @@ export const userContextMenuItems: ContextMenuItemType[] = [
     color: '#7c7c7c',
     ownerOnly: false,
   },
-]
+];
+
+export const friendsNavbarItems = [
+  {
+    id: 'friends',
+    label: 'Friends',
+    pathname: '/friends',
+  },
+  {
+    id: 'requests',
+    label: 'Requests',
+    pathname: '/friends/requests',
+  },
+  {
+    id: 'blocked',
+    label: 'Blocked',
+    pathname: '/friends/blocked',
+  },
+];
