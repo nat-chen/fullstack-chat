@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ConversationSidebarItemStyle } from '../../utils/styles';
 import { ContextMenuEvent, Group } from '../../utils/types';
 import styles from './index.module.scss';
@@ -9,8 +9,9 @@ type Props = {
 }
 
 export const GroupSidebarItem: React.FC<Props> = ({ group, onContextMenu }) => {
+  const { id } = useParams();
   const MAX_TITLE_LENGTH = 20;
-  const MA_MESSAGE_LENGTH = 50;
+  const MAX_MESSAGE_LENGTH = 50;
   const navigate = useNavigate();
   const getTransformedTitle = () => {
     if (!group.title) {
@@ -28,7 +29,8 @@ export const GroupSidebarItem: React.FC<Props> = ({ group, onContextMenu }) => {
   return (
     <ConversationSidebarItemStyle
       onClick={() => navigate(`/groups/${group.id}`)}
-      onContextMenu={(e) => onContextMenu(e, group)}
+      onContextMenu={(e: ContextMenuEvent) => onContextMenu(e, group)}
+      selected={parseInt(id!) === group.id}
     >
       <div className={styles.groupAvatar}></div>
       <div>
