@@ -29,8 +29,7 @@ export const MessagePanel: FC<Props> = ({ sendTypingStatus, isRecipientTyping })
     (state: RootState) => state.selectedConversationType.type
   );
   const recipient = getRecipientFromConversation(conversation, user);
-  const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const sendMessage = async () => {
     if (!routeId || !content) return;
     const id = parseInt(routeId);
     const params = { id, content };

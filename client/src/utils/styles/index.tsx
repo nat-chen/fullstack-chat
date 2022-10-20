@@ -1,9 +1,11 @@
 import styled, { css } from 'styled-components';
 import { fadeInUpwards } from './keyframes';
 import {
+  CharacterLimitProps,
   ContextMenuProps,
   ConversationSelectedProps,
   InputContainerProps,
+  MessageInputContainerProps,
   MessageItemContentProps,
   PageProps,
   SidebarItemProps,
@@ -202,12 +204,16 @@ export const MessageContainerStyle = styled.div`
   }
 `;
 
-export const MessageInputContainer = styled.div`
+export const MessageInputContainer = styled.div<MessageInputContainerProps>`
   box-sizing: border-box;
   background-color: #101010;
   border-radius: 5px;
   width: 100%;
-  padding: 24px 32px;
+  padding: 18px 32px;
+  display: flex;
+  gap: 20px;
+  align-items: ${({ isMultiLine }) => (isMultiLine ? 'top' : 'center')};
+  position: relative;
 `;
 
 export const MessagePanelFooter = styled.footer`
@@ -266,6 +272,7 @@ export const MessageItemHeader = styled.div`
 export const MessageItemContent = styled.div<MessageItemContentProps>`
   padding: ${({ padding }) => padding};
   width: 100%;
+  white-space: pre-wrap;
 `;
 
 export const ContextMenu = styled.ul<ContextMenuProps>`
@@ -634,4 +641,23 @@ export const GroupHeaderIcons = styled.div`
   display: flex;
   gap: 20px;
   align-items: center;
+`;
+
+export const TestContextMenu = styled.div<ContextMenuProps>`
+  ${({ top, left }) => css`
+    top: ${top}px;
+    left: ${left}px;
+  `}
+  width: 200px;
+  background-color: #000;
+`;
+
+export const CharacterLimit = styled.span<CharacterLimitProps>`
+  position: absolute;
+  bottom: 8px;
+  right: 36px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${({ atMaxLength }) =>
+    atMaxLength ? '#ff0000' : 'rgb(129, 129, 129)'};
 `;
