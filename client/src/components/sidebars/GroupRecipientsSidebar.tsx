@@ -1,3 +1,4 @@
+import { Crown } from 'akar-icons';
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom'
@@ -66,8 +67,11 @@ export const GroupRecipientsSidebar = () => {
           <GroupRecipientSidebarItem
             onContextMenu={(e) => onUserContextMenu(e, user)}
           >
-            <MessageItemAvatar />
-            <span>{user.firstName}</span>
+            <div className="left">
+              <MessageItemAvatar />
+              <span>{user.firstName}</span>
+            </div>
+            {user.id === group?.owner.id && <Crown color="#ffbf00" />}
           </GroupRecipientSidebarItem>
         ))}
         <span>Offline Users</span>
@@ -80,8 +84,11 @@ export const GroupRecipientsSidebar = () => {
             <GroupRecipientSidebarItem
               onContextMenu={(e) => onUserContextMenu(e, user)}
             >
-              <MessageItemAvatar />
-              <span>{user.firstName}</span>
+              <div className="left">
+                <MessageItemAvatar />
+                <span>{user.firstName}</span>
+              </div>
+              {user.id === group?.owner.id && <Crown color="#ffbf00" />}
             </GroupRecipientSidebarItem>
           ))}
         {groupSidebarState.showUserContextMenu && (
