@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { AddGroupRecipientParams, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Friend, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
+import { AddGroupRecipientParams, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Friend, FriendRequest, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const axiosClient = axios.create({ baseURL: API_URL });
@@ -102,4 +102,7 @@ export const updateGroupOwner = ({ id, newOwnerId }: UpdateGroupOwnerParams) =>
 export const leaveGroup = (id: number) =>
   axiosClient.delete(`/groups/${id}/recipients/leave`, config);
 
-export const fetchFriends = () => axiosClient.get<Friend[]>(`/friends`, config);
+  export const fetchFriends = () => axiosClient.get<Friend[]>('/friends', config);
+
+  export const fetchFriendRequests = () =>
+    axiosClient.get<FriendRequest[]>('/friends/requests', config);
