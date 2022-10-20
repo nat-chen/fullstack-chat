@@ -20,6 +20,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ConversationPageGuard } from './guards/ConversationPageGuard';
 import { GroupPageGuard } from './guards/GroupPageGuard';
 import { FriendsPage } from './pages/friends/FriendPage';
+import { FriendsLayoutPage } from './components/friends/FriendsLayoutPage';
 
 enableMapSet();
 
@@ -67,7 +68,7 @@ function App() {
               element={<GroupPageGuard children={<GroupChannelPage />} />}
             />
           </Route>
-          <Route path="friends" element={<FriendsPage />}>
+          <Route path="friends" element={<FriendsLayoutPage />}>
             <Route path="requests" element={<div>Friend Requests</div>} />
             <Route path="blocked" element={<div>Blocked</div>} />
           </Route>

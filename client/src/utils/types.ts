@@ -175,3 +175,10 @@ export type UpdateGroupOwnerParams = {
 };
 
 export type ContextMenuEvent = React.MouseEvent<HTMLDivElement, MouseEvent>;
+
+export type Friend = {
+  id: number;
+  sender: User;
+  receiver: User;
+  createdAt: number;
+};
