@@ -14,6 +14,12 @@ export const FriendsNavbar = styled.nav`
   font-size: 20px;
   padding: 48px 60px;
   border-bottom: 1px solid #30303035;
+  justify-content: space-between;
+  & .navLinks {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+  }
 `;
 
 export const FriendsNavbarItem = styled.span<FriendsNavbarItemProps>`
