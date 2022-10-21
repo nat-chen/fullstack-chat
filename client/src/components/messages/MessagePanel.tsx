@@ -1,13 +1,14 @@
+import { AxiosError } from 'axios';
 import React, { FC, useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../store';
 import { selectConversationById } from '../../store/conversationSlice';
 import { selectGroupById } from '../../store/groupSlice';
-import { createMessageThunk } from '../../store/messages/messageThunk';
-import { postGroupMessage } from '../../utils/api';
+import { createMessage, postGroupMessage } from '../../utils/api';
 import { AuthContext } from '../../utils/context/AuthContext';
 import { getRecipientFromConversation } from '../../utils/helpers';
+import { useToast } from '../../utils/hooks/useToast';
 import { MessagePanelBody, MessagePanelFooter, MessagePanelStyle, MessageTypingStatus } from '../../utils/styles';
 import { MessageContainer } from './MessageContainer';
 import { MessageInputField } from './MessageInputField';
@@ -19,33 +20,34 @@ type Props = {
 }
 
 export const MessagePanel: FC<Props> = ({ sendTypingStatus, isRecipientTyping }) => {
+  const toastId = 'rateLimitToast';
   const [content, setContent] = useState('');
   const { id: routeId } = useParams();
   const { user } = useContext(AuthContext);
+  const { error } = useToast({ theme: 'dark' });
   const dispatch = useDispatch<AppDispatch>();
   const conversation = useSelector((state: RootState) => selectConversationById(state, parseInt(routeId!)));
   const group = useSelector((state: RootState) =>
-  selectGroupById(state, parseInt(routeId!))
-);
+    selectGroupById(state, parseInt(routeId!))
+  );
   const selectedType = useSelector(
     (state: RootState) => state.selectedConversationType.type
   );
+
   const recipient = getRecipientFromConversation(conversation, user);
+
   const sendMessage = async () => {
     const trimmedContent = content.trim();
-    if (!routeId || !trimmedContent) return;
-    const id = parseInt(routeId);
-    const params = { id, content: trimmedContent };
-
-    switch (selectedType) {
-      case 'private':
-        return dispatch(createMessageThunk(params))
-          .then(() => setContent(''))
-          .catch((err) => console.log(err));
-      case 'group':
-        return postGroupMessage(params)
-          .then(() => setContent(''))
-          .catch((err) => console.log(err));
+    if (!routeId || !content.trim()) return;
+    const params = { id: parseInt(routeId), content: trimmedContent };
+    try {
+      selectedType === 'private'
+        ? await createMessage(params)
+        : await postGroupMessage(params);
+      setContent('');
+      } catch (err) {
+        (err as AxiosError).response?.status === 429 &&
+          error('You are rate limited', { toastId });
     }
   }
   return (
