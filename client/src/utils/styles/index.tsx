@@ -585,7 +585,7 @@ export const ConversationSearchbar = styled.input`
 
 export const ConversationTabContainer = styled.div``;
 
-export const UserSidebarItem = styled.div<SidebarItemProps>`
+export const UserSidebarItemStyle = styled.div<SidebarItemProps>`
   width: 100%;
   display: flex;
   align-items: center;
@@ -645,7 +645,7 @@ export const GroupRecipientSidebarItem = styled.div`
   margin: 10px 0;
   & .left {
     display: flex;
-    align-items: center;
+    align-items: center;f
     gap: 14px;
   }
 `;

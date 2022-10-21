@@ -202,3 +202,10 @@ export type AcceptFriendRequestResponse = {
   friend: Friend;
   friendRequest: FriendRequest;
 };
+
+export type UserSidebarRouteType = 'conversations' | 'friends' | 'connections';
+
+export type UserSidebarItemType = {
+  id: UserSidebarRouteType;
+  pathname: string;
+};
