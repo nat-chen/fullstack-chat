@@ -5,7 +5,7 @@ import { ConversationPanel } from '../../components/conversations/ConversationPa
 import { ConversationSidebar } from '../../components/sidebars/ConversationSidebar';
 import { AppDispatch } from '../../store';
 import { addConversation, fetchConversationsThunk, updateConversation } from '../../store/conversationSlice';
-import { addMessage, deleteMessage } from '../../store/messageSlice';
+import { addMessage, deleteMessage } from '../../store/messages/messageSlice';
 import { updateType } from '../../store/selectedSlice';
 import { SocketContext } from '../../utils/context/SocketContext';
 import { Conversation, MessageEventPayload } from '../../utils/types';

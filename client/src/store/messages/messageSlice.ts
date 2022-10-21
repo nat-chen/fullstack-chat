@@ -1,7 +1,7 @@
-import { deleteMessage as deleteMessageAPI, editMessage as editMessageAPI, getConversationMessages } from './../utils/api';
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ConversationMessage, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, MessageEventPayload, MessageType } from './../utils/types';
-import { RootState } from '.';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ConversationMessage, DeleteMessageResponse, MessageEventPayload, MessageType } from '../../utils/types';
+import { RootState } from '..';
+import { deleteMessageThunk, editMessageThunk, fetchMessagesThunk } from './messageThunk';
 
 export interface MessageState {
   messages: ConversationMessage[];
@@ -12,27 +12,6 @@ const initialState: MessageState = {
   messages: [],
   loading: false,
 }
-
-export const fetchMessagesThunk = createAsyncThunk(
-  'messages/fetch',
-  (id: number) => {
-    return getConversationMessages(id);
-  }
-);
-
-export const deleteMessageThunk = createAsyncThunk(
-  'messages/delete',
-  (params: DeleteMessageParams) => {
-    return deleteMessageAPI(params);
-  }
-);
-
-export const editMessageThunk = createAsyncThunk(
-  'messages/edit',
-  (params: EditMessagePayload) => {
-    return editMessageAPI(params);
-  }
-);
 
 export const messagesSlice = createSlice({
   name: 'messages',
@@ -88,15 +67,15 @@ export const messagesSlice = createSlice({
       })
       .addCase(deleteMessageThunk.fulfilled, (state, action) => {
         console.log('deleteMessageThunk.fulfilled', state, action)
-        // const { data } = action.payload;
-        // const conversationMessages = state.messages.find(
-        //   (cm) => cm.id === data.conversationId
-        // );
-        // if (!conversationMessages) return;
-        // const messageIndex = conversationMessages.messages.findIndex(
-        //   (m) => m.id === data.messageId
-        // );
-        // conversationMessages?.messages.splice(messageIndex, 1);
+        const { data } = action.payload;
+        const conversationMessages = state.messages.find(
+          (cm) => cm.id === data.conversationId
+        );
+        if (!conversationMessages) return;
+        const messageIndex = conversationMessages.messages.findIndex(
+          (m) => m.id === data.messageId
+        );
+        conversationMessages?.messages.splice(messageIndex, 1);
       })
       .addCase(editMessageThunk.fulfilled, (state, action) => {
         console.log('editMessageThunk.fulfilled');

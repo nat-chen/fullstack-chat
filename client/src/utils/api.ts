@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { AcceptFriendRequestResponse, AddGroupRecipientParams, CancelFriendRequestResponse, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Friend, FriendRequest, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
+import { AcceptFriendRequestResponse, AddGroupRecipientParams, CancelFriendRequestResponse, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, DeleteMessageResponse, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Friend, FriendRequest, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const axiosClient = axios.create({ baseURL: API_URL });
@@ -33,7 +33,7 @@ export const postNewConversation = (data: CreateConversationParams) =>
   axiosClient.post<Conversation>(`/conversations`, data, config);
 
 export const deleteMessage = ({ id, messageId }: DeleteGroupMessageParams) =>
-  axiosClient.delete<DeleteGroupMessageResponse>(
+  axiosClient.delete<DeleteMessageResponse>(
     `/conversations/${id}/messages/${messageId}`,
     config
   );
@@ -51,12 +51,11 @@ export const fetchGroups = () =>
 export const fetchGroupById = (id: number) =>
   axiosClient.get<Group>(`/groups/${id}`, config);
 
-export const fetchGroupMessages = (id: number) => {
+export const fetchGroupMessages = (id: number) =>
   axiosClient.get<FetchGroupMessagePayload>(
     `/groups/${id}/messages`,
     config,
   );
-}
 
 export const postGroupMessage = ({ id, content }: CreateMessageParams) =>
   axiosClient.post(`/groups/${id}/messages`, { content }, config);

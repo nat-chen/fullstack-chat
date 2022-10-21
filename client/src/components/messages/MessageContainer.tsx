@@ -8,7 +8,7 @@ import { AppDispatch, RootState } from '../../store';
 import { SelectedMessageContextMenu } from '../context-menus/SelectedMessageContextMenu';
 import { EditMessageContainer } from './EditMessageContainer';
 import { FormattedMessage } from './FormattedMessage';
-import { selectConversationMessage } from '../../store/messageSlice';
+import { selectConversationMessage } from '../../store/messages/messageSlice';
 import { selectType } from '../../store/selectedSlice';
 import { editMessageContent, resetMessageContainer, setIsEditing, setSelectedMessage } from '../../store/messageContainerSlice';
 import { selectGroupMessage } from '../../store/groupMessageSlice';

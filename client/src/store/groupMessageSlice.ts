@@ -59,14 +59,14 @@ export const groupMessagesSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchGroupMessagesThunk.fulfilled, (state, action) => {
       console.log('fetchGroupMessagesThunk.fulfilled', state, action)
-      // const { id } = action.payload.data;
-      // console.log('fetchGroupMessagesThunk.fulfilled');
-      // console.log(action.payload.data);
-      // const index = state.messages.findIndex((gm) => gm.id === id);
-      // const exists = state.messages.find((gm) => gm.id === id);
-      // exists
-      //   ? (state.messages[index] = action.payload.data)
-      //   : state.messages.push(action.payload.data);
+      const { id } = action.payload.data;
+      console.log('fetchGroupMessagesThunk.fulfilled');
+      console.log(action.payload.data);
+      const index = state.messages.findIndex((gm) => gm.id === id);
+      const exists = state.messages.find((gm) => gm.id === id);
+      exists
+        ? (state.messages[index] = action.payload.data)
+        : state.messages.push(action.payload.data);
     })
     .addCase(deleteGroupMessageThunk.fulfilled, (state, action) => {
       console.log('deleteGroupMessageThunk.fulfilled');

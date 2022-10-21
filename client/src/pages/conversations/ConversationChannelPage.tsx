@@ -5,9 +5,7 @@ import { MessagePanel } from '../../components/messages/MessagePanel';
 import { SocketContext } from '../../utils/context/SocketContext';
 import { ConversationChannelPageStyle } from "../../utils/styles";
 import { AppDispatch } from '../../store';
-import { fetchMessagesThunk } from '../../store/messageSlice';
-import { editMessage } from '../../utils/api';
-import { MessageType } from '../../utils/types';
+import { fetchMessagesThunk } from '../../store/messages/messageThunk';
 
 export const ConversationChannelPage = () => {
   const { id } = useParams();
