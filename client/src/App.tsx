@@ -20,7 +20,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ConversationPageGuard } from './guards/ConversationPageGuard';
 import { GroupPageGuard } from './guards/GroupPageGuard';
 import { FriendsPage } from './pages/friends/FriendPage';
-import { FriendsLayoutPage } from './components/friends/FriendsLayoutPage';
+import { FriendsLayoutPage } from './pages/friends/FriendsLayoutPage';
 import { FriendRequestPage } from './pages/friends/FriendRequestPage';
 
 enableMapSet();

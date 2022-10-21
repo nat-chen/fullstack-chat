@@ -102,7 +102,10 @@ export const updateGroupOwner = ({ id, newOwnerId }: UpdateGroupOwnerParams) =>
 export const leaveGroup = (id: number) =>
   axiosClient.delete(`/groups/${id}/recipients/leave`, config);
 
-  export const fetchFriends = () => axiosClient.get<Friend[]>('/friends', config);
+export const fetchFriends = () => axiosClient.get<Friend[]>('/friends', config);
 
-  export const fetchFriendRequests = () =>
-    axiosClient.get<FriendRequest[]>('/friends/requests', config);
+export const fetchFriendRequests = () =>
+  axiosClient.get<FriendRequest[]>('/friends/requests', config);
+
+export const createFriendRequest = (email: string) =>
+  axiosClient.post<FriendRequest>('/friends/requests', { email }, config);

@@ -1,17 +1,20 @@
+import { useState } from 'react';
 import { AiOutlineUserAdd } from 'react-icons/ai';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { FriendsPage } from '../../pages/friends/FriendPage';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { friendsNavbarItems } from '../../utils/constants';
 import { Button } from '../../utils/styles/button';
-import { FriendsNavbar, FriendsNavbarItem, FriendsPageStyle } from '../../utils/styles/friends';
+import { FriendsNavbar, FriendsNavbarItem } from '../../utils/styles/friends';
+import { CreateFriendRequestModal } from '../modals/CreateFriendRequestModal';
 
-export const FriendsLayoutPage = () => {
+export const FriendPageNavbar = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
   return (
-    <FriendsPageStyle>
+    <>
+      {showModal && <CreateFriendRequestModal setShowModal={setShowModal} />}
       <FriendsNavbar>
-      <div className="navLinks">
+        <div className="navLinks">
           {friendsNavbarItems.map((item) => (
             <FriendsNavbarItem
               key={item.id}
@@ -22,13 +25,16 @@ export const FriendsLayoutPage = () => {
             </FriendsNavbarItem>
           ))}
         </div>
-        <Button size="sm" flex={true} variant="primary">
+        <Button
+          size="sm"
+          flex={true}
+          variant="primary"
+          onClick={() => setShowModal(true)}
+        >
           <AiOutlineUserAdd size={24} />
           <span>Add Friend</span>
         </Button>
       </FriendsNavbar>
-      {pathname === '/friends' && <FriendsPage />}
-      <Outlet />
-    </FriendsPageStyle>
-  )
-}
+    </>
+  );
+};

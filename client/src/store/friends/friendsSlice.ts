@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Friend, FriendRequest } from '../../utils/types';
-import { fetchFriendRequestThunk, fetchFriendsThunk } from './friendsThunk';
+import { createFriendRequestThunk, fetchFriendRequestThunk, fetchFriendsThunk } from './friendsThunk';
 
 export interface FriendsState {
   friends: Friend[];
@@ -26,7 +26,11 @@ export const friendsSlice = createSlice({
     .addCase(fetchFriendRequestThunk.fulfilled, (state, action) => {
       console.log('fetchFriendRequestsThunk.fulfilled');
       state.friendRequests = action.payload.data;
-    }),
+    })
+    .addCase(createFriendRequestThunk.fulfilled, (state, action) => {
+      console.log('createFriendRequestThunk.fulfilled');
+      state.friendRequests.push(action.payload.data);
+    })
 });
 
 export const {} = friendsSlice.actions;
