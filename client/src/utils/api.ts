@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { AddGroupRecipientParams, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Friend, FriendRequest, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
+import { AddGroupRecipientParams, CancelFriendRequestResponse, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Friend, FriendRequest, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const axiosClient = axios.create({ baseURL: API_URL });
@@ -111,4 +111,7 @@ export const createFriendRequest = (email: string) =>
   axiosClient.post<FriendRequest>('/friends/requests', { email }, config);
 
 export const cancelFriendRequest = (id: number) =>
-  axiosClient.delete(`/friends/requests/${id}/cancel`, config);
+  axiosClient.delete<CancelFriendRequestResponse>(
+    `/friends/requests/${id}/cancel`,
+    config
+  );
