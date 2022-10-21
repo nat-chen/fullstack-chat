@@ -2,7 +2,7 @@ import { FC, useContext } from 'react';
 import { MdCheck, MdClose } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store';
-import { acceptFriendRequestThunk, cancelFriendRequestThunk } from '../../store/friends/friendsThunk';
+import { acceptFriendRequestThunk, cancelFriendRequestThunk, rejectFriendRequestThunk } from '../../store/friends/friendsThunk';
 import { AuthContext } from '../../utils/context/AuthContext';
 import { FriendRequestItemContainer, FriendRequestItemIcon } from '../../utils/styles/friends';
 import { FriendRequest, HandleFriendRequestAction } from '../../utils/types';
@@ -20,7 +20,7 @@ export const FriendRequestItem: FC<Props> = ({ friendRequest }) => {
       case 'accept':
         return dispatch(acceptFriendRequestThunk(friendRequest.id));;
       case 'reject':
-        return;
+        return dispatch(rejectFriendRequestThunk(friendRequest.id));
       default: {
         return dispatch(cancelFriendRequestThunk(friendRequest.id));
       }

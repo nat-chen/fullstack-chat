@@ -122,3 +122,10 @@ export const acceptFriendRequest = (id: number) =>
     {},
     config
   );
+
+export const rejectFriendRequest = (id: number) =>
+  axiosClient.patch<FriendRequest>(
+    `/friends/requests/${id}/reject`,
+    {},
+    config
+  );

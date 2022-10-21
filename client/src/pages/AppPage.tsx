@@ -27,7 +27,12 @@ export const AppPage = () => {
     socket.on('onFriendRequestAccepted', (payload: AcceptFriendRequestResponse) => {
       console.log('onFriendRequestAccepted');
       dispatch(removeFriendRequest(payload.friendRequest));
-    })
+    });
+
+    socket.on('onFriendRequestRejected', (payload: FriendRequest) => {
+      console.log('onFriendRequestRejected');
+      dispatch(removeFriendRequest(payload));
+    });
 
     return () => {
       socket.removeAllListeners();
