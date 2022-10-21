@@ -4,6 +4,7 @@ import {
   fetchFriendRequests as fetchFriendRequestsAPI,
   createFriendRequest as createFriendRequestAPI,
   cancelFriendRequest as cancelFriendRequestAPI,
+  acceptFriendRequest as acceptFriendRequestAPI,
 } from '../../utils/api';
 
 export const fetchFriendsThunk = createAsyncThunk('friends/fetch', () => fetchFriendsAPI());
@@ -21,4 +22,10 @@ export const createFriendRequestThunk = createAsyncThunk(
 export const cancelFriendRequestThunk = createAsyncThunk(
   'friends/request/cancel',
   (id: number) => cancelFriendRequestAPI(id)
+);
+
+
+export const acceptFriendRequestThunk = createAsyncThunk(
+  'friends/request/accept',
+  (id: number) => acceptFriendRequestAPI(id)
 );

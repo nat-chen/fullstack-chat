@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { AddGroupRecipientParams, CancelFriendRequestResponse, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Friend, FriendRequest, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
+import { AcceptFriendRequestResponse, AddGroupRecipientParams, CancelFriendRequestResponse, Conversation, CreateConversationParams, CreateGroupParams, CreateMessageParams, CreateUserParams, DeleteGroupMessageParams, DeleteGroupMessageResponse, DeleteMessageParams, EditMessagePayload, FetchGroupMessagePayload, FetchMessagePayload, Friend, FriendRequest, Group, GroupMessageType, MessageType, RemoveGroupRecipientParams, UpdateGroupOwnerParams, User, UserCredentialsParams } from './types'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const axiosClient = axios.create({ baseURL: API_URL });
@@ -113,5 +113,12 @@ export const createFriendRequest = (email: string) =>
 export const cancelFriendRequest = (id: number) =>
   axiosClient.delete<CancelFriendRequestResponse>(
     `/friends/requests/${id}/cancel`,
+    config
+  );
+
+export const acceptFriendRequest = (id: number) =>
+  axiosClient.patch<AcceptFriendRequestResponse>(
+    `/friends/requests/${id}/accept`,
+    {},
     config
   );
