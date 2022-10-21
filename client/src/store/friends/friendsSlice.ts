@@ -18,6 +18,12 @@ export const friendsSlice = createSlice({
   reducers: {
     addFriendRequest: (state, action: PayloadAction<FriendRequest>) => {
       state.friendRequests.push(action.payload);
+    },
+    removeFriendRequest: (state, action: PayloadAction<FriendRequest>) => {
+      const { id } = action.payload;
+      state.friendRequests = state.friendRequests.filter(
+        (friendRequest) => friendRequest.id !== id
+      );
     }
   },
   extraReducers: (builder) =>
@@ -40,8 +46,8 @@ export const friendsSlice = createSlice({
       state.friendRequests = state.friendRequests.filter(
         (friendRequest) => friendRequest.id !== id
       );
-    }),
+    })
 });
 
-export const { addFriendRequest } = friendsSlice.actions;
+export const { addFriendRequest, removeFriendRequest } = friendsSlice.actions;
 export default friendsSlice.reducer;
