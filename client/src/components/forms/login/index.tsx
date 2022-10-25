@@ -1,16 +1,12 @@
-import { useContext, useState } from 'react';
-import { useForm } from 'react-hook-form'
+import { useContext } from 'react';
+import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
-import { postLoginUser } from '../../utils/api';
-import { SocketContext } from '../../utils/context/SocketContext';
-import {
-  Button,
-  InputContainer,
-  InputField,
-  InputLabel,
-} from '../../utils/styles';
-import { UserCredentialsParams } from '../../utils/types';
-import styles from './index.module.scss';
+import { postLoginUser } from '../../../utils/api';
+import { SocketContext } from '../../../utils/context/SocketContext';
+import { InputContainer, InputField, InputLabel } from '../../../utils/styles';
+import { Button } from '../../../utils/styles/button';
+import { UserCredentialsParams } from '../../../utils/types';
+import styles from '../index.module.scss';
 
 export const LoginForm = () => {
   const {
@@ -23,6 +19,7 @@ export const LoginForm = () => {
 
   const onSubmit = async (data: UserCredentialsParams) => {
     console.log(socket);
+    console.log(socket.connected);
     try {
       await postLoginUser(data);
       console.log('Success');
@@ -38,11 +35,11 @@ export const LoginForm = () => {
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <InputContainer>
-        <InputLabel htmlFor="email">Email</InputLabel>
+        <InputLabel htmlFor="username">Username</InputLabel>
         <InputField
-          type="email"
-          id="email"
-          {...register('email', { required: true })}
+          type="text"
+          id="username"
+          {...register('username', { required: true })}
         />
       </InputContainer>
       <InputContainer className={styles.loginFormPassword}>
@@ -55,11 +52,11 @@ export const LoginForm = () => {
       </InputContainer>
       <Button>Login</Button>
       <div className={styles.footerText}>
-        <span>Don't have an account?</span>
+        <span>Don't have an account? </span>
         <Link to="/register">
           <span>Register</span>
         </Link>
       </div>
     </form>
-  )
+  );
 }

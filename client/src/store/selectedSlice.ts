@@ -20,7 +20,8 @@ export const selectedTypeSlice = createSlice({
   },
 });
 
-export const selectType = (state: RootState) => state.selectedConversationType.type;
+export const selectType = (state: RootState) =>
+  state.selectedConversationType.type;
 
 export const { updateType } = selectedTypeSlice.actions;
 

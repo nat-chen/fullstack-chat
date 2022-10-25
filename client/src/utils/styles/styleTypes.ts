@@ -6,7 +6,7 @@ export type PageProps = Partial<{
 
 export type InputContainerProps = Partial<{
   backgroundColor: string;
-}>
+}>;
 
 export type MessageItemContentProps = Partial<{
   padding: string;
@@ -49,4 +49,13 @@ export type FlexProps = Partial<{
 
 export type FriendRequestItemIconProps = Partial<{
   isAccept: boolean;
+}>;
+
+export type SettingsSidebarItemProps = {
+  isActive: boolean;
+};
+
+export type UserBannerProps = Partial<{
+  backgroundUrl: string;
+  backgroundColor: string;
 }>;

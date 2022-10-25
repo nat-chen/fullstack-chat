@@ -3,15 +3,15 @@ import { ConversationMessage, DeleteMessageResponse, MessageEventPayload, Messag
 import { RootState } from '..';
 import { deleteMessageThunk, editMessageThunk, fetchMessagesThunk } from './messageThunk';
 
-export interface MessageState {
+export interface MessagesState {
   messages: ConversationMessage[];
   loading: boolean;
 }
 
-const initialState: MessageState = {
+const initialState: MessagesState = {
   messages: [],
   loading: false,
-}
+};
 
 export const messagesSlice = createSlice({
   name: 'messages',
@@ -20,35 +20,26 @@ export const messagesSlice = createSlice({
     addMessage: (state, action: PayloadAction<MessageEventPayload>) => {
       console.log(state);
       console.log(action);
-      const { conversation, message} = action.payload;
+      const { conversation, message } = action.payload;
       const conversationMessage = state.messages.find((cm) => cm.id === conversation.id);
       conversationMessage?.messages.unshift(message);
     },
     deleteMessage: (state, action: PayloadAction<DeleteMessageResponse>) => {
       console.log('Inside deleteMessage reducer');
       const { payload } = action;
-      const conversationMessages = state.messages.find(
-        (cm) => cm.id === payload.conversationId
-      );
+      const conversationMessages = state.messages.find((cm) => cm.id === payload.conversationId);
       if (!conversationMessages) return;
       const messageIndex = conversationMessages.messages.findIndex(
         (m) => m.id === payload.messageId
       );
-      console.log(conversationMessages);
-      console.log(messageIndex);
-      console.log(payload);
       conversationMessages.messages.splice(messageIndex, 1);
     },
     editMessage: (state, action: PayloadAction<MessageType>) => {
       console.log('editMessageReducer');
       const message = action.payload;
-      const conversationMessage = state.messages.find(
-        (cm) => cm.id === message.conversation.id
-      );
+      const conversationMessage = state.messages.find((cm) => cm.id === message.conversation.id);
       if (!conversationMessage) return;
-      const messageIndex = conversationMessage.messages.findIndex(
-        (m) => m.id === message.id
-      );
+      const messageIndex = conversationMessage.messages.findIndex((m) => m.id === message.id);
       conversationMessage.messages[messageIndex] = message;
     },
   },
@@ -66,11 +57,8 @@ export const messagesSlice = createSlice({
         }
       })
       .addCase(deleteMessageThunk.fulfilled, (state, action) => {
-        console.log('deleteMessageThunk.fulfilled', state, action)
         const { data } = action.payload;
-        const conversationMessages = state.messages.find(
-          (cm) => cm.id === data.conversationId
-        );
+        const conversationMessages = state.messages.find((cm) => cm.id === data.conversationId);
         if (!conversationMessages) return;
         const messageIndex = conversationMessages.messages.findIndex(
           (m) => m.id === data.messageId
@@ -79,18 +67,16 @@ export const messagesSlice = createSlice({
       })
       .addCase(editMessageThunk.fulfilled, (state, action) => {
         console.log('editMessageThunk.fulfilled');
-        const {data: message} = action.payload;
+        const { data: message } = action.payload;
         const { id } = message.conversation;
         const conversationMessage = state.messages.find((cm) => cm.id === id);
         if (!conversationMessage) return;
-        const messageIndex = conversationMessage.messages.findIndex(
-          (m) => m.id === message.id
-        );
+        const messageIndex = conversationMessage.messages.findIndex((m) => m.id === message.id);
         console.log(messageIndex);
         conversationMessage.messages[messageIndex] = message;
         console.log('Updated Message');
       });
-  }
+  },
 });
 
 const selectConversationMessages = (state: RootState) => state.messages.messages;

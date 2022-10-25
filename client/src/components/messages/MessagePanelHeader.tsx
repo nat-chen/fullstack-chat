@@ -1,63 +1,33 @@
-import { PeopleGroup, PersonAdd } from 'akar-icons';
-import { useContext, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { AppDispatch, RootState } from '../../store';
-import { selectConversationById } from '../../store/conversationSlice';
-import { toggleSidebar } from '../../store/groupRecipientsSidebarSlice';
-import { selectGroupById } from '../../store/groupSlice';
+import { RootState } from '../../store';
 import { selectType } from '../../store/selectedSlice';
-import { AuthContext } from '../../utils/context/AuthContext'
-import { GroupHeaderIcons, MessagePanelHeaderStyle } from '../../utils/styles'
-import { AddGroupRecipientModal } from '../modals/AddGroupRecipientModal';
+import { ConversationAudioCall } from '../conversations/ConversationAudioCall';
+import { ConversationVideoCall } from '../conversations/ConversationVideoCall';
+import { MessagePanelConversationHeader } from './headers/MessagePanelConversationHeader';
+import { MessagePanelGroupHeader } from './headers/MessagePanelGroupHeader';
 
 export const MessagePanelHeader = () => {
-  const { user } = useContext(AuthContext);
-  const { id } = useParams();
-  const [showModal, setShowModal] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
+  const { id: routeId } = useParams();
+  const { isCalling, isCallInProgress, activeConversationId, callType } =
+    useSelector((state: RootState) => state.call);
   const type = useSelector(selectType);
-  const conversation = useSelector(
-    (state: RootState) => selectConversationById(state, parseInt(id!))
+
+  const showCallPanel = isCalling || isCallInProgress;
+  const isRouteActive = activeConversationId === parseInt(routeId!);
+  console.log(isRouteActive);
+  console.log(callType === 'video');
+  console.log(callType);
+  if (!showCallPanel)
+    return type === 'private' ? (
+      <MessagePanelConversationHeader />
+    ) : (
+      <MessagePanelGroupHeader />
+    );
+
+  return isRouteActive && callType === 'video' ? (
+    <ConversationVideoCall />
+  ) : (
+    <ConversationAudioCall />
   );
-  const group = useSelector(
-    (state: RootState) => selectGroupById(state, parseInt(id!))
-  );
-  const displayName =
-    user?.id === conversation?.creator.id
-      ? `${conversation?.recipient.firstName} ${conversation?.recipient.lastName}`
-      : `${conversation?.creator.firstName} ${conversation?.creator.lastName}`;
-  const groupName = group?.title || 'Group';
-  const headerTitle = type === 'group' ? groupName : displayName;
-  return (
-    <>
-      {showModal && (
-        <AddGroupRecipientModal
-          showModal={showModal}
-          setShowModal={setShowModal}
-        />
-      )}
-      <MessagePanelHeaderStyle>
-        <div>
-          <span>{headerTitle}</span>
-        </div>
-        <GroupHeaderIcons>
-          {type === 'group' && user?.id === group?.owner?.id && (
-            <PersonAdd
-              cursor="pointer"
-              size={30}
-              onClick={() => setShowModal(true)}
-            />
-          )}
-          {type === 'group' && (
-            <PeopleGroup
-              cursor="pointer"
-              size={30}
-              onClick={() => dispatch(toggleSidebar())}
-            />
-          )}
-        </GroupHeaderIcons>
-      </MessagePanelHeaderStyle>
-    </>
-  );
-}
+};

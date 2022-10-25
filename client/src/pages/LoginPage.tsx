@@ -1,4 +1,4 @@
-import { LoginForm } from '../components/forms/LoginForm';
+import { LoginForm } from '../components/forms/login';
 import { Page } from '../utils/styles';
 
 export const LoginPage = () => {
@@ -6,5 +6,5 @@ export const LoginPage = () => {
     <Page display="flex" justifyContent="center" alignItems="center">
       <LoginForm />
     </Page>
-  )
-}
+  );
+};

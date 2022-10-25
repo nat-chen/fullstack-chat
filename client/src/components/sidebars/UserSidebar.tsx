@@ -1,62 +1,44 @@
-import { ArrowCycle, ChatDots, Person } from 'akar-icons';
-import { UserAvatar, UserSidebarItemStyle, UserSidebarStyle } from '../../utils/styles';
-import styles from './index.module.scss';
-import avatar from '../../__assets__/avatar_1.png';
-import { FC, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { UserSidebarItemType, UserSidebarRouteType } from '../../utils/types';
+import { useState, useContext } from 'react';
+import {
+  UserSidebarFooter,
+  UserSidebarHeader,
+  UserSidebarScrollableContainer,
+  UserSidebarStyle,
+} from '../../utils/styles';
 import { userSidebarItems } from '../../utils/constants';
-
-export const getIcon = (id: UserSidebarRouteType) => {
-  switch (id) {
-    case 'conversations':
-      return ChatDots;
-    case 'friends':
-      return Person;
-    case 'connections':
-      return ArrowCycle;
-    default:
-      return ChatDots;
-  }
-};
-
-type Props = {
-  item: UserSidebarItemType;
-};
-
-export const UserSidebarItem: FC<Props> = ({ item }) => {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const Icon = getIcon(item.id);
-  const ICON_SIZE = 30;
-  const STROKE_WIDTH = 2;
-
-  const isActive = () => {
-    if (pathname.includes('/groups') && item.id === 'conversations')
-      return true;
-    return pathname.includes(item.pathname);
-  }
-
-  return (
-    <UserSidebarItemStyle
-      onClick={() => navigate(item.pathname)}
-      active={isActive()}
-    >
-      <Icon size={ICON_SIZE} strokeWidth={STROKE_WIDTH} />
-    </UserSidebarItemStyle>
-  );
-}
+import { UserSidebarItem } from './items/UserSidebarItem';
+import { AuthContext } from '../../utils/context/AuthContext';
+import { UpdatePresenceStatusModal } from '../modals/UpdatePresenceStatusModal';
+import { RiLogoutCircleLine } from 'react-icons/ri';
+import { UserAvatar } from '../users/UserAvatar';
+import { logoutUser as logoutUserAPI } from '../../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export const UserSidebar = () => {
   const [showModal, setShowModal] = useState(false);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const logoutUser = () => {
+    logoutUserAPI().finally(() => navigate('/login', { replace: true }));
+  };
+
   return (
     <>
+      {showModal && <UpdatePresenceStatusModal setShowModal={setShowModal} />}
       <UserSidebarStyle>
-        <UserAvatar src={avatar} alt="avatar" width="55px" />
-        <hr className={styles.hr} />
-        {userSidebarItems.map((item) => (
-          <UserSidebarItem item={item} />
-        ))}
+        <UserSidebarHeader>
+          <UserAvatar user={user!} onClick={() => setShowModal(true)} />
+        </UserSidebarHeader>
+        <UserSidebarScrollableContainer>
+          {userSidebarItems.map((item) => (
+            <UserSidebarItem item={item} />
+          ))}
+        </UserSidebarScrollableContainer>
+
+        <UserSidebarFooter>
+          <RiLogoutCircleLine size={30} onClick={() => logoutUser()} />
+        </UserSidebarFooter>
       </UserSidebarStyle>
     </>
   );

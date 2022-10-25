@@ -1,26 +1,24 @@
 import React, { Dispatch, FC, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { AppDispatch } from '../../store';
-import { createConversationThunk } from '../../store/conversationSlice';
-import { createGroupThunk } from '../../store/groupSlice';
-import { searchUsers } from '../../utils/api';
-import { useDebounce } from '../../utils/hooks/useDebounce';
 import {
   Button,
   InputContainer,
   InputLabel,
   TextField,
 } from '../../utils/styles';
-import { ConversationType, User } from '../../utils/types';
+import styles from './index.module.scss';
+import { useDispatch } from 'react-redux';
+import { createConversationThunk } from '../../store/conversationSlice';
+import { User } from '../../utils/types';
+import { AppDispatch } from '../../store';
+import { useNavigate } from 'react-router-dom';
+import { useDebounce } from '../../utils/hooks/useDebounce';
+import { searchUsers } from '../../utils/api';
 import { RecipientResultContainer } from '../recipients/RecipientResultContainer';
 import { RecipientField } from '../recipients/RecipientField';
-import styles from './index.module.scss';
 
 type Props = {
   setShowModal: Dispatch<React.SetStateAction<boolean>>;
-}
+};
 
 export const CreateConversationForm: FC<Props> = ({ setShowModal }) => {
   const [query, setQuery] = useState('');
@@ -43,13 +41,13 @@ export const CreateConversationForm: FC<Props> = ({ setShowModal }) => {
         .catch((err) => console.log(err))
         .finally(() => setSearching(false));
     }
-  }, [debouncedQuery])
+  }, [debouncedQuery]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!message || !selectedUser) return;
     return dispatch(
-      createConversationThunk({ email: selectedUser.email, message })
+      createConversationThunk({ username: selectedUser.username, message })
     )
       .unwrap()
       .then(({ data }) => {
@@ -91,5 +89,5 @@ export const CreateConversationForm: FC<Props> = ({ setShowModal }) => {
       </section>
       <Button>Create Conversation</Button>
     </form>
-  )
-}
+  );
+};

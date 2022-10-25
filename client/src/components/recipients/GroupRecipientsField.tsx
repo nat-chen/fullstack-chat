@@ -1,5 +1,10 @@
-import { Dispatch, FC, SetStateAction } from 'react'
-import { InputContainer, InputField, InputLabel } from '../../utils/styles';
+import { Dispatch, FC, SetStateAction } from 'react';
+import {
+  InputContainer,
+  InputField,
+  InputLabel,
+  RecipientChipContainer,
+} from '../../utils/styles';
 
 type Props = {
   setQuery: Dispatch<SetStateAction<string>>;
@@ -14,4 +19,4 @@ export const GroupRecipientsField: FC<Props> = ({ setQuery }) => {
       </InputContainer>
     </section>
   );
-}
+};

@@ -1,28 +1,29 @@
-import React, { createRef, Dispatch, FC, useEffect, useState } from 'react'
+import { createRef, Dispatch, FC, useEffect } from 'react';
 import { ModalContainer, ModalContentBody, ModalHeader } from '.';
 import { OverlayStyle } from '../../utils/styles';
-import { MdClose } from 'react-icons/md';
 import { CreateConversationForm } from '../forms/CreateConversationForm';
-import { ConversationTypeForm } from '../forms/ConversationTypeForm';
-import { ConversationType } from '../../utils/types';
+import { MdClose } from 'react-icons/md';
 
 type Props = {
-  setShowModal: Dispatch<React.SetStateAction<boolean>>
-}
+  setShowModal: Dispatch<React.SetStateAction<boolean>>;
+};
 
 export const CreateConversationModal: FC<Props> = ({ setShowModal }) => {
   const ref = createRef<HTMLDivElement>();
 
   useEffect(() => {
-    const handleKeydown = (e: KeyboardEvent) => e.key === 'Escape' && setShowModal(false);
+    const handleKeydown = (e: KeyboardEvent) =>
+      e.key === 'Escape' && setShowModal(false);
     window.addEventListener('keydown', handleKeydown);
-    return () => window.removeEventListener('keydown', handleKeydown)
+    return () => window.removeEventListener('keydown', handleKeydown);
   }, []);
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleOverlayClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     const { current } = ref;
     if (current === e.target) {
-      console.log('close modal');
+      console.log('Close Modal');
       setShowModal(false);
     }
   };
@@ -40,5 +41,5 @@ export const CreateConversationModal: FC<Props> = ({ setShowModal }) => {
         </ModalContentBody>
       </ModalContainer>
     </OverlayStyle>
-  )
-}
+  );
+};

@@ -12,7 +12,7 @@ const initialState: GroupRecipientSidebarState = {
   showSidebar: true,
   showUserContextMenu: false,
   points: { x: 0, y: 0 },
-}
+};
 
 export const groupRecipientSidebarSlice = createSlice({
   name: 'groupRecipientSidebarSlice',
@@ -29,8 +29,8 @@ export const groupRecipientSidebarSlice = createSlice({
     },
     setContextMenuLocation: (state, action: PayloadAction<Points>) => {
       state.points = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const {

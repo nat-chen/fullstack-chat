@@ -1,11 +1,11 @@
-import { useSelector } from 'react-redux'
-import { RootState } from '../../store'
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import { FriendListContainer } from '../../utils/styles/friends';
 import { FriendRequestItem } from './FriendRequestItem';
 
 export const FriendRequestList = () => {
   const friendRequests = useSelector(
-    (state: RootState) => state.friends.friendRequests,
+    (state: RootState) => state.friends.friendRequests
   );
   return (
     <FriendListContainer>
@@ -17,5 +17,5 @@ export const FriendRequestList = () => {
         />
       ))}
     </FriendListContainer>
-  )
-}
+  );
+};

@@ -6,12 +6,15 @@ import { editGroupMessageThunk } from '../../store/groupMessageSlice';
 import { setIsEditing } from '../../store/messageContainerSlice';
 import { editMessageThunk } from '../../store/messages/messageThunk';
 import { selectType } from '../../store/selectedSlice';
-import { EditMessageActionsContainer, EditMessageInputField } from '../../utils/styles';
+import {
+  EditMessageActionsContainer,
+  EditMessageInputField,
+} from '../../utils/styles';
 import { EditMessagePayload } from '../../utils/types';
 
 type Props = {
   onEditMessageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+};
 
 export const EditMessageContainer: FC<Props> = ({ onEditMessageChange }) => {
   const { id } = useParams();
@@ -20,6 +23,7 @@ export const EditMessageContainer: FC<Props> = ({ onEditMessageChange }) => {
     (state: RootState) => state.messageContainer
   );
   const conversationType = useSelector((state: RootState) => selectType(state));
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(messageBeingEdited);
@@ -31,7 +35,7 @@ export const EditMessageContainer: FC<Props> = ({ onEditMessageChange }) => {
     const params: EditMessagePayload = {
       id: parseInt(id!),
       messageId: messageBeingEdited.id,
-      content: messageBeingEdited.content,
+      content: messageBeingEdited.content || '',
     };
     console.log(params);
     console.log('Editing...', conversationType);
@@ -42,7 +46,8 @@ export const EditMessageContainer: FC<Props> = ({ onEditMessageChange }) => {
       : dispatch(editGroupMessageThunk(params)).finally(() =>
           dispatch(setIsEditing(false))
         );
-  }
+  };
+
   return (
     <div style={{ width: '100%' }}>
       <form onSubmit={onSubmit}>
@@ -57,5 +62,5 @@ export const EditMessageContainer: FC<Props> = ({ onEditMessageChange }) => {
         </div>
       </EditMessageActionsContainer>
     </div>
-  )
-}
+  );
+};

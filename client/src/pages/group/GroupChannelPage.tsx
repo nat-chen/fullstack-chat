@@ -1,21 +1,30 @@
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { AppDispatch, RootState } from '../../store';
+import { MessagePanel } from '../../components/messages/MessagePanel';
 import { SocketContext } from '../../utils/context/SocketContext';
 import { ConversationChannelPageStyle } from '../../utils/styles';
-import { MessagePanel } from '../../components/messages/MessagePanel';
-import { editGroupMessage, fetchGroupMessagesThunk } from '../../store/groupMessageSlice';
+import { AppDispatch, RootState } from '../../store';
+import {
+  editGroupMessage,
+  fetchGroupMessagesThunk,
+} from '../../store/groupMessageSlice';
 import { GroupMessageType } from '../../utils/types';
-import { GroupRecipientsSidebar } from '../../components/sidebars/GroupRecipientsSidebar';
+import { GroupRecipientsSidebar } from '../../components/sidebars/group-recipients/GroupRecipientsSidebar';
+import { EditGroupModal } from '../../components/modals/EditGroupModal';
 
 export const GroupChannelPage = () => {
   const { id } = useParams();
   const socket = useContext(SocketContext);
   const dispatch = useDispatch<AppDispatch>();
-  const [isRecipientTyping] = useState(false);
+  const [isRecipientTyping, setIsRecipientTyping] = useState(false);
 
-  const showSidebar = useSelector((state: RootState) => state.groupSidebar.showSidebar);
+  const { showEditGroupModal } = useSelector(
+    (state: RootState) => state.groups
+  );
+  const showSidebar = useSelector(
+    (state: RootState) => state.groupSidebar.showSidebar
+  );
 
   useEffect(() => {
     const groupId = parseInt(id!);
@@ -24,8 +33,8 @@ export const GroupChannelPage = () => {
 
   useEffect(() => {
     const groupId = id!;
-    console.log(groupId)
-    socket.emit('onGroupJoin', { groupId })
+    console.log(groupId);
+    socket.emit('onGroupJoin', { groupId });
     socket.on('onGroupMessageUpdate', (message: GroupMessageType) => {
       console.log('onGroupMessageUpdate received');
       console.log(message);
@@ -34,13 +43,14 @@ export const GroupChannelPage = () => {
     return () => {
       socket.emit('onGroupLeave', { groupId });
       socket.off('onGroupMessageUpdate');
-    }
+    };
   }, [id]);
 
   const sendTypingStatus = () => {};
 
   return (
     <>
+      {showEditGroupModal && <EditGroupModal />}
       <ConversationChannelPageStyle>
         <MessagePanel
           sendTypingStatus={sendTypingStatus}
@@ -49,5 +59,5 @@ export const GroupChannelPage = () => {
       </ConversationChannelPageStyle>
       {showSidebar && <GroupRecipientsSidebar />}
     </>
-  )
-}
+  );
+};

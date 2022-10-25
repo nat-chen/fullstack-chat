@@ -19,8 +19,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ConversationPageGuard } from './guards/ConversationPageGuard';
 import { GroupPageGuard } from './guards/GroupPageGuard';
-import { FriendsPage } from './pages/friends/FriendPage';
+import { FriendsPage } from './pages/friends/FriendsPage';
 import { FriendsLayoutPage } from './pages/friends/FriendsLayoutPage';
+import { SettingsProfilePage } from './pages/settings/SettingsProfilePage';
+import { SettingsPage } from './pages/settings/SettingsPage';
+import { SettingsAppearancePage } from './pages/settings/SettingsAppearancePage';
+import { CurrentCallPage } from './pages/calls/CurrentCallPage';
+import { CallsPage } from './pages/calls/CallsPage';
 import { FriendRequestPage } from './pages/friends/FriendRequestPage';
 
 enableMapSet();
@@ -54,7 +59,7 @@ function App() {
       <Routes>
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route element={ <AuthenticatedRoute children={<AppPage />} />}>
+        <Route element={<AuthenticatedRoute children={<AppPage />} />}>
           <Route path="conversations" element={<ConversationPage />}>
             <Route
               path=":id"
@@ -73,11 +78,18 @@ function App() {
             <Route path="requests" element={<FriendRequestPage />} />
             <Route path="blocked" element={<div>Blocked</div>} />
           </Route>
+          <Route path="settings" element={<SettingsPage />}>
+            <Route path="profile" element={<SettingsProfilePage />} />
+            <Route path="appearance" element={<SettingsAppearancePage />} />
+          </Route>
+          <Route path="calls" element={<CallsPage />}>
+            <Route path="current" element={<CurrentCallPage />} />
+          </Route>
         </Route>
       </Routes>
       <ToastContainer theme="dark" />
     </AppWithProviders>
-  )
+  );
 }
 
 export default App;

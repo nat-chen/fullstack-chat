@@ -1,6 +1,10 @@
 import { FC } from 'react';
-import { RecipientBottomSection, RecipientResultContainerStyle, RecipientResultItem, RecipientScrollableItemContainer } from '../../utils/styles';
-import { ConversationType, User } from '../../utils/types';
+import {
+  RecipientResultContainerStyle,
+  RecipientResultItem,
+  RecipientScrollableItemContainer,
+} from '../../utils/styles';
+import { User } from '../../utils/types';
 
 type Props = {
   userResults: User[];
@@ -19,7 +23,7 @@ export const RecipientResultContainer: FC<Props> = ({
             key={user.id}
             onClick={() => handleUserSelect(user)}
           >
-            <span>{user.email}</span>
+            <span>{user.username}</span>
           </RecipientResultItem>
         ))}
       </RecipientScrollableItemContainer>

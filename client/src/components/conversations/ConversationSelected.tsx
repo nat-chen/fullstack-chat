@@ -1,9 +1,12 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { AppDispatch, RootState } from '../../store'
+import { AppDispatch, RootState } from '../../store';
 import { updateType } from '../../store/selectedSlice';
 import { chatTypes } from '../../utils/constants';
-import { ConversationSelectedItem, ConversationSelectedStyle } from '../../utils/styles';
+import {
+  ConversationSelectedItem,
+  ConversationSelectedStyle,
+} from '../../utils/styles';
 import { ConversationTypeData } from '../../utils/types';
 
 export const ConversationSelected = () => {
@@ -30,4 +33,4 @@ export const ConversationSelected = () => {
       ))}
     </ConversationSelectedStyle>
   );
-}
+};

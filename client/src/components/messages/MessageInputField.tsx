@@ -1,8 +1,9 @@
-import { CirclePlusFill, FaceVeryHappy } from 'akar-icons';
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 import { CharacterLimit, MessageInputContainer } from '../../utils/styles';
 import { MessageTextField } from '../inputs/MessageTextField';
+import { FaceVeryHappy } from 'akar-icons';
 import styles from './index.module.scss';
+import { MessageAttachmentActionIcon } from './MessageAttachmentActionIcon';
 
 type Props = {
   content: string;
@@ -10,9 +11,9 @@ type Props = {
   placeholderName: string;
   sendMessage: () => void;
   sendTypingStatus: () => void;
-}
+};
 
-export const MessageInputField:FC<Props> = ({
+export const MessageInputField: FC<Props> = ({
   content,
   placeholderName,
   setContent,
@@ -27,14 +28,8 @@ export const MessageInputField:FC<Props> = ({
   return (
     <>
       <MessageInputContainer isMultiLine={isMultiLine}>
-        <CirclePlusFill className={styles.icon} size={ICON_SIZE} />
+        <MessageAttachmentActionIcon />
         <form onSubmit={sendMessage} className={styles.form}>
-          {/* <MessageInput
-            value={content}
-            onChange={updateContent}
-            onKeyDown={sendTypingStatus}
-            placeholder={`Send a mssage to ${placeholderName}`}
-          /> */}
           <MessageTextField
             message={content}
             setMessage={setContent}
@@ -52,5 +47,5 @@ export const MessageInputField:FC<Props> = ({
         )}
       </MessageInputContainer>
     </>
-  )
-}
+  );
+};

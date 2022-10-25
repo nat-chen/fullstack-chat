@@ -3,8 +3,9 @@ import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { MessagePanel } from '../../components/messages/MessagePanel';
 import { SocketContext } from '../../utils/context/SocketContext';
-import { ConversationChannelPageStyle } from "../../utils/styles";
+import { ConversationChannelPageStyle } from '../../utils/styles';
 import { AppDispatch } from '../../store';
+import { editMessage } from '../../store/messages/messageSlice';
 import { fetchMessagesThunk } from '../../store/messages/messageThunk';
 
 export const ConversationChannelPage = () => {
@@ -40,8 +41,9 @@ export const ConversationChannelPage = () => {
     socket.on('onMessageUpdate', (message) => {
       console.log('onMessageUpdate received');
       console.log(message);
-      // dispatch(editMessage(message));
-    })
+      dispatch(editMessage(message));
+    });
+
     return () => {
       socket.emit('onConversationLeave', { conversationId });
       socket.off('userJoin');
@@ -54,7 +56,6 @@ export const ConversationChannelPage = () => {
 
   const sendTypingStatus = () => {
     if (isTyping) {
-      console.log('isTyping = true');
       clearTimeout(timer);
       setTimer(
         setTimeout(() => {
@@ -64,7 +65,6 @@ export const ConversationChannelPage = () => {
         }, 2000)
       );
     } else {
-      console.log('isTyping = false');
       setIsTyping(true);
       socket.emit('onTypingStart', { conversationId: id });
     }
@@ -78,4 +78,4 @@ export const ConversationChannelPage = () => {
       ></MessagePanel>
     </ConversationChannelPageStyle>
   );
-}
+};

@@ -1,20 +1,27 @@
 import { Dispatch, FC, useEffect, useState } from 'react';
+import { GroupRecipientsField } from '../recipients/GroupRecipientsField';
+import {
+  InputContainer,
+  InputLabel,
+  TextField,
+  Button,
+  RecipientChipContainer,
+  InputField,
+} from '../../utils/styles';
+import styles from './index.module.scss';
+import { User } from '../../utils/types';
+import { useDebounce } from '../../utils/hooks/useDebounce';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../store';
-import { createGroupThunk } from '../../store/groupSlice';
 import { searchUsers } from '../../utils/api';
-import { useDebounce } from '../../utils/hooks/useDebounce';
-import { Button, InputContainer, InputField, InputLabel, RecipientChipContainer, TextField } from '../../utils/styles';
-import { User } from '../../utils/types';
-import { GroupRecipientsField } from '../recipients/GroupRecipientsField';
 import { RecipientResultContainer } from '../recipients/RecipientResultContainer';
 import { SelectedGroupRecipientChip } from '../recipients/SelectedGroupRecipientChip';
-import styles from './index.module.scss';
+import { createGroupThunk } from '../../store/groupSlice';
 
 type Props = {
   setShowModal: Dispatch<React.SetStateAction<boolean>>;
-}
+};
 
 export const CreateGroupForm: FC<Props> = ({ setShowModal }) => {
   const [title, setTitle] = useState('');
@@ -43,7 +50,7 @@ export const CreateGroupForm: FC<Props> = ({ setShowModal }) => {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectedRecipients.length === 0 || !message || !title) return;
-    const users = selectedRecipients.map((user) => user.email);
+    const users = selectedRecipients.map((user) => user.username);
     return dispatch(createGroupThunk({ title, users }))
       .unwrap()
       .then(({ data }) => {

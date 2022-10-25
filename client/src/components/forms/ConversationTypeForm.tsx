@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction } from 'react';
+import { FC, Dispatch, SetStateAction } from 'react';
 import { chatTypes } from '../../utils/constants';
 import { ConversationType } from '../../utils/types';
 import styles from './index.module.scss';
@@ -6,7 +6,7 @@ import styles from './index.module.scss';
 type Props = {
   type: ConversationType;
   setType: Dispatch<SetStateAction<ConversationType>>;
-}
+};
 
 export const ConversationTypeForm: FC<Props> = ({ type, setType }) => {
   return (
@@ -27,5 +27,5 @@ export const ConversationTypeForm: FC<Props> = ({ type, setType }) => {
         </div>
       ))}
     </form>
-  )
-}
+  );
+};
