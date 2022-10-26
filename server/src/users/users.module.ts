@@ -1,14 +1,14 @@
-import { UsersController } from './controllers/user.controller';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ImageStorageModule } from 'src/image-storage/image-storage.module';
 import { Services } from 'src/utils/constants';
-import { Peer, Profile, User, UserPresence } from '../utils/typeorm';
-import { UserService } from './services/user.service';
-import { UserProfileService } from './services/user-profile.service';
-import { UserPresenceService } from './services/user-presence.service';
+import { Peer, Profile, User, UserPresence } from 'src/utils/typeorm';
 import { UserPresenceController } from './controllers/user-presence.controller';
 import { UserProfilesController } from './controllers/user-profile.controller';
-import { ImageStorageModule } from 'src/image-storage/image-storage.module';
+import { UsersController } from './controllers/user.controller';
+import { UserPresenceService } from './services/user-presence.service';
+import { UserProfileService } from './services/user-profile.service';
+import { UserService } from './services/user.service';
 
 @Module({
   imports: [

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-export class CreateConversationForm extends HttpException {
+export class CreateConversationException extends HttpException {
   constructor(msg?: string) {
     const defaultMessage = 'Create Conversation Exception';
     super(

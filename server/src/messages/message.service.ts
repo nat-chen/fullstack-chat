@@ -70,7 +70,7 @@ export class MessagesService implements IMessageService {
   async deleteMessage(params: DeleteMessageParams) {
     const { conversationId } = params;
     const msgParams = { id: conversationId, limit: 5 };
-    const conversation = await this.conversationService.getMessage(msgParams);
+    const conversation = await this.conversationService.getMessages(msgParams);
     if (!conversation) throw new ConversationNotFoundException();
     const findMessageParams = buildFindMessageParams(params);
     const message = await this.messageRepository.findOne(findMessageParams);

@@ -1,7 +1,7 @@
-import { ImageStorageService } from './image-storage.service';
 import { Module } from '@nestjs/common';
 import { Services } from 'src/utils/constants';
 import { S3 } from '@aws-sdk/client-s3';
+import { ImageStorageService } from './image-storage.service';
 
 @Module({
   providers: [

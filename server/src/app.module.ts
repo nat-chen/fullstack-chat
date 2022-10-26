@@ -27,7 +27,7 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') {
   imports: [
     AuthModule,
     UsersModule,
-    ConfigModule.forRoot({ envFilePath: '.env.development' }),
+    ConfigModule.forRoot({ envFilePath }),
     PassportModule.register({ session: true }),
     TypeOrmModule.forRoot({
       type: 'mysql',

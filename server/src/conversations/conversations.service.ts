@@ -3,11 +3,15 @@ import { IUserService } from 'src/users/interfaces/user';
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Conversation, Message, User } from 'src/utils/typeorm';
-import { AccessParams, CreateConversationParams } from 'src/utils/types';
+import { AccessParams, CreateConversationParams, GetConversationMessagesParams, UpdateConversationParams } from 'src/utils/types';
 import { IConversationsService } from './conversations';
 import { Services } from 'src/utils/constants';
 import { Repository } from 'typeorm';
 import { ConversationNotFoundException } from './exceptions/ConversationNotFound';
+import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
+import { FriendNotFoundException } from 'src/friends/exceptions/FriendNotFound';
+import { ConversationExistsException } from './exceptions/ConversationExists';
+import { CreateConversationException } from './exceptions/CreateConversation';
 
 @Injectable()
 export class ConversationsService implements IConversationsService {
@@ -66,7 +70,7 @@ export class ConversationsService implements IConversationsService {
     });
   }
 
-  async createConversation(user: User, params: CreateConversationParams) {
+  async createConversation(creator: User, params: CreateConversationParams) {
     const { username, message: content } = params;
     const recipient = await this.userService.findUser({ username });
     if (!recipient) throw new UserNotFoundException();
@@ -74,7 +78,7 @@ export class ConversationsService implements IConversationsService {
       throw new CreateConversationException(
         'Cannot create Conversation with yourself',
       );
-    const isFriends = await this.friendsService.isFriends(
+    const isFriends = await this.friendService.isFriends(
       creator.id,
       recipient.id,
     );

@@ -11,8 +11,8 @@ import { GroupMessageController } from './controllers/group-messages.controller'
 import { GroupRecipientsController } from './controllers/group-recipients.controller';
 import { GroupRecipientService } from './services/group-recipient.service';
 import { GroupMiddleware } from './middleware/group.middleware';
-import { MessageAttachmentsModule } from 'src/message-attachments/message-attachments.module';
 import { ImageStorageModule } from 'src/image-storage/image-storage.module';
+import { MessageAttachmentsModule } from 'src/message-attachments/message-attachments.module';
 
 @Module({
   imports: [

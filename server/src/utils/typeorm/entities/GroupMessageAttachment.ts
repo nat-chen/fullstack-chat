@@ -6,7 +6,7 @@ export class GroupMessageAttachment {
   @PrimaryGeneratedColumn('uuid')
   key: string;
 
-  @ManyToOne(() => GroupMessage, (message) => message.attachment, {
+  @ManyToOne(() => GroupMessage, (message) => message.attachments, {
     onDelete: 'CASCADE',
   })
   message: GroupMessage;

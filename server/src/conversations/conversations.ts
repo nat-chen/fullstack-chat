@@ -1,5 +1,10 @@
 import { Conversation, User } from 'src/utils/typeorm';
-import { AccessParams, CreateConversationParams, GetConversationMessagesParams, UpdateConversationParams } from 'src/utils/types';
+import {
+  AccessParams,
+  CreateConversationParams,
+  GetConversationMessagesParams,
+  UpdateConversationParams,
+} from 'src/utils/types';
 
 export interface IConversationsService {
   createConversation(
