@@ -1,13 +1,14 @@
-import { IUserService } from 'src/users/user';
+import { IUserService } from 'src/users/interfaces/user';
 import {
   Controller,
-  Get,
+  Inject,
   HttpException,
   HttpStatus,
-  Inject,
+  Get,
   Query,
 } from '@nestjs/common';
 import { Routes, Services } from 'src/utils/constants';
+import { UserAlreadyExists } from '../exceptions/UserAlreadyExists';
 
 @Controller(Routes.USERS)
 export class UsersController {
@@ -17,10 +18,19 @@ export class UsersController {
 
   @Get('search')
   searchUsers(@Query('query') query: string) {
-    console.log('query');
     if (!query) {
       throw new HttpException('Provide a valid query', HttpStatus.BAD_REQUEST);
     }
     return this.userService.searchUsers(query);
+  }
+
+  @Get('check')
+  async checkUsername(@Query('username') username: string) {
+    if (!username) {
+      throw new HttpException('Invalid Query', HttpStatus.BAD_REQUEST);
+    }
+    const user = await this.userService.findUser({ username });
+    if (user) throw new UserAlreadyExists();
+    return HttpStatus.OK;
   }
 }

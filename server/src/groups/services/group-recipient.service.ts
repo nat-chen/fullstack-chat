@@ -1,7 +1,6 @@
-import { GroupParticipantsNotFound } from './../dtos/GroupParticipantNotFound';
 import { GroupNotFoundException } from './../exceptions/GroupNotFound';
-import { Inject, HttpException, HttpStatus } from '@nestjs/common';
-import { IUserService } from 'src/users/user';
+import { Inject, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { IUserService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
 import {
   AddGroupRecipientParams,
@@ -13,7 +12,9 @@ import { IGroupService } from '../interfaces/group';
 import { IGroupRecipientService } from '../interfaces/group-recipient';
 import { NotGroupOwnerException } from '../exceptions/NotGroupOwner';
 import { Group } from 'src/utils/typeorm';
+import { GroupParticipantNotFound } from '../exceptions/GroupParticipantNotFound';
 
+@Injectable()
 export class GroupRecipientService implements IGroupRecipientService {
   constructor(
     @Inject(Services.USERS) private userService: IUserService,
@@ -26,17 +27,14 @@ export class GroupRecipientService implements IGroupRecipientService {
     if (group.owner.id !== params.userId) {
       throw new HttpException('Insufficient Permissions', HttpStatus.FORBIDDEN);
     }
-    const recipient = await this.userService.findUser({ email: params.email });
-    if (!recipient) {
+    const recipient = await this.userService.findUser({
+      username: params.username,
+    });
+    if (!recipient)
       throw new HttpException('Cannot Add User', HttpStatus.BAD_REQUEST);
-    }
-    if (group.creator.id !== params.userId) {
-      throw new HttpException('Insufficient Permissions', HttpStatus.FORBIDDEN);
-    }
     const inGroup = group.users.find((user) => user.id === recipient.id);
-    if (inGroup) {
+    if (inGroup)
       throw new HttpException('User already in group', HttpStatus.BAD_REQUEST);
-    }
     group.users = [...group.users, recipient];
     const savedGroup = await this.groupService.saveGroup(group);
     return { group: savedGroup, user: recipient };
@@ -53,20 +51,18 @@ export class GroupRecipientService implements IGroupRecipientService {
     const userToBeRemoved = await this.userService.findUser({
       id: removeUserId,
     });
-    if (!userToBeRemoved) {
+    if (!userToBeRemoved)
       throw new HttpException('User cannot be removed', HttpStatus.BAD_REQUEST);
-    }
     const group = await this.groupService.findGroupById(id);
     if (!group) throw new GroupNotFoundException();
     // Not group owner
     if (group.owner.id !== issuerId) throw new NotGroupOwnerException();
     // Temporary
-    if (group.owner.id === removeUserId) {
+    if (group.owner.id === removeUserId)
       throw new HttpException(
         'Cannot remove yourself as owner',
         HttpStatus.BAD_REQUEST,
       );
-    }
     group.users = group.users.filter((u) => u.id !== removeUserId);
     const savedGroup = await this.groupService.saveGroup(group);
     return { group: savedGroup, user: userToBeRemoved };
@@ -76,7 +72,7 @@ export class GroupRecipientService implements IGroupRecipientService {
     const group = await this.groupService.findGroupById(id);
     if (!group) throw new GroupNotFoundException();
     const user = group.users.find((user) => user.id === userId);
-    if (!user) throw new GroupParticipantsNotFound();
+    if (!user) throw new GroupParticipantNotFound();
     return group;
   }
 

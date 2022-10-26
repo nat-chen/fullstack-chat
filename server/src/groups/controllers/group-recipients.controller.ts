@@ -13,7 +13,9 @@ import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import { AddGroupRecipientDto } from '../dtos/AddGroupRecipient.dto';
 import { IGroupRecipientService } from '../interfaces/group-recipient';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller(Routes.GROUP_RECIPIENTS)
 export class GroupRecipientsController {
   constructor(
@@ -26,9 +28,9 @@ export class GroupRecipientsController {
   async addGroupRecipient(
     @AuthUser() { id: userId }: User,
     @Param('id', ParseIntPipe) id: number,
-    @Body() { email }: AddGroupRecipientDto,
+    @Body() { username }: AddGroupRecipientDto,
   ) {
-    const params = { id, userId, email };
+    const params = { id, userId, username };
     const response = await this.groupRecipientService.addGroupRecipient(params);
     this.eventEmitter.emit('group.user.add', response);
     return response;
@@ -63,6 +65,7 @@ export class GroupRecipientsController {
     const response = await this.groupRecipientService.removeGroupRecipient(
       params,
     );
+    this.eventEmitter.emit('group.user.remove', response);
     return response.group;
   }
 }

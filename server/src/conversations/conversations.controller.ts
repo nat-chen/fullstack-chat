@@ -14,7 +14,9 @@ import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import { IConversationsService } from './conversations';
 import { CreateConversationDto } from './dtos/CreateConversation.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller(Routes.CONVERSATIONS)
 @UseGuards(AuthenticatedGuard)
 export class ConversationsController {
@@ -44,9 +46,6 @@ export class ConversationsController {
 
   @Get(':id')
   async getConversationById(@Param('id') id: number) {
-    const conversation = await this.conversationsService.findConversationById(
-      id,
-    );
-    return conversation;
+    return this.conversationsService.findById(id);
   }
 }

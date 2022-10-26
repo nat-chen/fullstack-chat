@@ -9,7 +9,7 @@ import {
 export interface IMessageService {
   createMessage(params: CreateMessageParams): Promise<CreateMessageResponse>;
 
-  getMessagesByConversationId(conversationId: number): Promise<Message[]>;
+  getMessages(id: number): Promise<Message[]>;
 
   deleteMessage(params: DeleteMessageParams);
 

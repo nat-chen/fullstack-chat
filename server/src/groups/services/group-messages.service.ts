@@ -1,3 +1,4 @@
+import { IMessageAttachmentsService } from './../../message-attachments/message-attachments';
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
@@ -21,6 +22,8 @@ export class GroupMessageService implements IGroupMessageService {
     private readonly groupRepository: Repository<Group>,
     @Inject(Services.GROUPS)
     private readonly groupService: IGroupService,
+    @Inject(Services.MESSAGE_ATTACHMENTS)
+    private readonly messageAttachmentsService: IMessageAttachmentsService,
   ) {}
 
   async createGroupMessage({
@@ -29,28 +32,31 @@ export class GroupMessageService implements IGroupMessageService {
   }: CreateGroupMessageParams) {
     const { content, author } = params;
     const group = await this.groupService.findGroupById(id);
-    if (!group) {
+    if (!group)
       throw new HttpException('No Group Found', HttpStatus.BAD_REQUEST);
-    }
     const findUser = group.users.find((u) => u.id === author.id);
-    if (!findUser) {
+    if (!findUser)
       throw new HttpException('User not in group', HttpStatus.BAD_REQUEST);
-    }
     const groupMessage = this.groupMessageRepository.create({
       content,
       group,
       author: instanceToPlain(author),
+      attachments: params.attachments
+        ? await this.messageAttachmentsService.createGroupAttachments(
+            params.attachments,
+          )
+        : [],
     });
     const savedMessage = await this.groupMessageRepository.save(groupMessage);
     group.lastMessageSent = savedMessage;
-    const updatedGroup = this.groupService.saveGroup(group);
+    const updatedGroup = await this.groupService.saveGroup(group);
     return { message: savedMessage, group: updatedGroup };
   }
 
   getGroupMessages(id: number): Promise<GroupMessage[]> {
     return this.groupMessageRepository.find({
       where: { group: { id } },
-      relations: ['author'],
+      relations: ['author', 'attachments', 'author.profile'],
       order: {
         createdAt: 'DESC',
       },

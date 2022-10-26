@@ -1,3 +1,5 @@
+import { EmptyMessageException } from './../../messages/exceptions/EmptyMessage';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateMessageDto } from '../../messages/dtos/CreateMessage.dto';
 import {
   Body,
@@ -9,6 +11,8 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthUser } from 'src/utils/decorators';
 import { Routes, Services } from 'src/utils/constants';
@@ -16,6 +20,8 @@ import { User } from 'src/utils/typeorm';
 import { IGroupMessageService } from '../interfaces/group-messages';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EditMessageDto } from 'src/messages/dtos/EditMessage';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
+import { Attachment } from 'src/utils/types';
 
 @Controller(Routes.GROUP_MESSAGES)
 export class GroupMessageController {
@@ -25,23 +31,32 @@ export class GroupMessageController {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  @Throttle(5, 10)
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      {
+        name: 'attachments',
+        maxCount: 5,
+      },
+    ]),
+  )
   @Post()
   async createGroupMessage(
     @AuthUser() user: User,
+    @UploadedFiles() { attachments }: { attachments: Attachment[] },
     @Param('id', ParseIntPipe) id: number,
     @Body() { content }: CreateMessageDto,
   ) {
     console.log(`Creating Group Message for ${id}`);
-    const response = await this.groupMessageService.createGroupMessage({
-      author: user,
-      groupId: id,
-      content,
-    });
+    if (!attachments && !content) throw new EmptyMessageException();
+    const params = { groupId: id, author: user, content, attachments };
+    const response = await this.groupMessageService.createGroupMessage(params);
     this.eventEmitter.emit('group.message.create', response);
     return;
   }
 
   @Get()
+  @SkipThrottle()
   async getGroupMessages(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) id: number,
@@ -52,6 +67,7 @@ export class GroupMessageController {
   }
 
   @Delete(':messageId')
+  @SkipThrottle()
   async deleteGroupMessage(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) groupId: number,
@@ -71,6 +87,7 @@ export class GroupMessageController {
   }
 
   @Patch(':messageId')
+  @SkipThrottle()
   async editGroupMessage(
     @AuthUser() { id: userId }: User,
     @Param('id', ParseIntPipe) groupId: number,

@@ -1,5 +1,6 @@
+import { generateUUIDV4 } from 'src/utils/helpers';
 import { GroupOwnerTransferException } from './../exceptions/GroupOwnerTransfer';
-import { IUserService } from 'src/users/user';
+import { IUserService } from 'src/users/interfaces/user';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group, User } from 'src/utils/typeorm';
@@ -11,9 +12,11 @@ import {
   CreateGroupParams,
   FetchGroupsParams,
   TransferOwnerParams,
+  UpdateGroupDetailsParams,
 } from 'src/utils/types';
 import { GroupNotFoundException } from '../exceptions/GroupNotFound';
 import { UserNotFoundException } from 'src/users/exceptions/UserNotFound';
+import { IImageStorageService } from 'src/image-storage/image-storage';
 
 @Injectable()
 export class GroupService implements IGroupService {
@@ -22,12 +25,14 @@ export class GroupService implements IGroupService {
     private readonly groupRepository: Repository<Group>,
     @Inject(Services.USERS)
     private readonly userService: IUserService,
+    @Inject(Services.IMAGE_UPLOAD_SERVICE)
+    private readonly imageStorageService: IImageStorageService,
   ) {}
 
   async createGroup(params: CreateGroupParams) {
     const { creator, title } = params;
-    const usersPromise = params.users.map((email) =>
-      this.userService.findUser({ email }),
+    const usersPromise = params.users.map((username) =>
+      this.userService.findUser({ username }),
     );
     const users = (await Promise.all(usersPromise)).filter((user) => user);
     users.push(creator);
@@ -44,13 +49,24 @@ export class GroupService implements IGroupService {
       .leftJoinAndSelect('group.users', 'users')
       .leftJoinAndSelect('group.creator', 'creator')
       .leftJoinAndSelect('group.owner', 'owner')
+      .leftJoinAndSelect('group.lastMessageSent', 'lastMessageSent')
+      .leftJoinAndSelect('users.profile', 'usersProfile')
+      .leftJoinAndSelect('users.presence', 'usersPresence')
+      .orderBy('group.lastMessageSentAt', 'DESC')
       .getMany();
   }
 
   findGroupById(id: number): Promise<Group> {
     return this.groupRepository.findOne({
       where: { id },
-      relations: ['creator', 'users', 'lastMessageSent', 'owner'],
+      relations: [
+        'creator',
+        'users',
+        'lastMessageSent',
+        'owner',
+        'users.profile',
+        'users.presence',
+      ],
     });
   }
 
@@ -82,6 +98,18 @@ export class GroupService implements IGroupService {
     const newOwner = await this.userService.findUser({ id: newOwnerId });
     if (!newOwner) throw new UserNotFoundException();
     group.owner = newOwner;
+    return this.groupRepository.save(group);
+  }
+
+  async updateDetails(params: UpdateGroupDetailsParams): Promise<Group> {
+    const group = await this.findGroupById(params.id);
+    if (!group) throw new GroupNotFoundException();
+    if (params.avatar) {
+      const key = generateUUIDV4();
+      await this.imageStorageService.upload({ key, file: params.avatar });
+      group.avatar = key;
+    }
+    group.title = params.title ?? group.title;
     return this.groupRepository.save(group);
   }
 }

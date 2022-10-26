@@ -22,14 +22,16 @@ export class WebsocketAdapter extends IoAdapter {
         console.log('CHAT_APP_SESSION_ID DOES NOT EXIST');
         return next(new Error('Not Authenticated'));
       }
-      console.log(CHAT_APP_SESSION_ID);
       const signedCookie = cookieParser.signedCookie(
         CHAT_APP_SESSION_ID,
         process.env.COOKIE_SECRET,
       );
-      console.log(signedCookie);
       if (!signedCookie) return next(new Error('Error signing cookie'));
       const sessionDB = await sessionRepository.findOne({ id: signedCookie });
+      if (!sessionDB) return next(new Error('No session found'));
+      const userFromJson = JSON.parse(sessionDB.json);
+      if (!userFromJson.passport || !userFromJson.passport.user)
+        return next(new Error('Passport or User object does not exist.'));
       const userDB = plainToInstance(
         User,
         JSON.parse(sessionDB.json).passport.user,

@@ -2,7 +2,7 @@ import {
   CreateUserDetails,
   FindUserOptions,
   FindUserParams,
-} from '../utils/types';
+} from '../../utils/types';
 import { User } from 'src/utils/typeorm';
 
 export interface IUserService {

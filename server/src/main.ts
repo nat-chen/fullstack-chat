@@ -8,16 +8,18 @@ import * as session from 'express-session';
 import { TypeormStore } from 'connect-typeorm/out';
 import * as passport from 'passport';
 import { WebsocketAdapter } from './gateway/gateway.adapter';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const { PORT, COOKIE_SECRET } = process.env;
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const sessionRepository = getRepository(Session);
   const adapter = new WebsocketAdapter(app);
   app.useWebSocketAdapter(adapter);
-  app.enableCors({ origin: ['http://localhost:3000'], credentials: true });
   app.setGlobalPrefix('api');
+  app.enableCors({ origin: ['http://localhost:3000'], credentials: true });
   app.useGlobalPipes(new ValidationPipe());
+  app.set('trust proxy', 'loopback');
   app.use(
     session({
       secret: COOKIE_SECRET,
@@ -30,12 +32,20 @@ async function bootstrap() {
       store: new TypeormStore().connect(sessionRepository),
     }),
   );
+
   app.use(passport.initialize());
   app.use(passport.session());
+
   try {
-    await app.listen(PORT, () => console.log(`Running on Port ${PORT}`));
+    await app.listen(PORT, () => {
+      console.log(`Running on Port ${PORT}`);
+      console.log(
+        `Running in ${process.env.ENVIRONMENT} mode: ${process.env.ENVIRONMENT_MESSAGE}`,
+      );
+    });
   } catch (err) {
     console.log(err);
   }
 }
+
 bootstrap();

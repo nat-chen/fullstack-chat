@@ -1,3 +1,4 @@
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
   Body,
   Controller,
@@ -8,15 +9,19 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Throttle } from '@nestjs/throttler';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { Routes, Services } from 'src/utils/constants';
 import { AuthUser } from 'src/utils/decorators';
 import { User } from 'src/utils/typeorm';
 import { CreateMessageDto } from './dtos/CreateMessage.dto';
 import { EditMessageDto } from './dtos/EditMessage';
-import { IMessageService } from './messages';
+import { IMessageService } from './message';
+import { EmptyMessageException } from './exceptions/EmptyMessage';
+import { Attachment } from 'src/utils/types';
 
 @Controller(Routes.MESSAGES)
 export class MessageController {
@@ -25,30 +30,37 @@ export class MessageController {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  // @Throttle(5, 10)
+  @Throttle(5, 10)
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      {
+        name: 'attachments',
+        maxCount: 5,
+      },
+    ]),
+  )
   @Post()
   async createMessage(
     @AuthUser() user: User,
-    @Param('id', ParseIntPipe) conversationId: number,
+    @UploadedFiles() { attachments }: { attachments: Attachment[] },
+    @Param('id', ParseIntPipe) id: number,
     @Body() { content }: CreateMessageDto,
   ) {
-    const params = { user, conversationId, content };
+    if (!attachments && !content) throw new EmptyMessageException();
+    const params = { user, id, content, attachments };
     const response = await this.messageService.createMessage(params);
     this.eventEmitter.emit('message.create', response);
     return;
   }
 
   @Get()
+  @SkipThrottle()
   async getMessagesFromConversation(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    console.log(id);
-    const messages = await this.messageService.getMessagesByConversationId(id);
-    return {
-      id,
-      messages,
-    };
+    const messages = await this.messageService.getMessages(id);
+    return { id, messages };
   }
 
   @Delete(':messageId')
@@ -57,16 +69,9 @@ export class MessageController {
     @Param('id', ParseIntPipe) conversationId: number,
     @Param('messageId', ParseIntPipe) messageId: number,
   ) {
-    await this.messageService.deleteMessage({
-      userId: user.id,
-      conversationId,
-      messageId,
-    });
-    this.eventEmitter.emit('message.delete', {
-      userId: user.id,
-      messageId,
-      conversationId,
-    });
+    const params = { userId: user.id, conversationId, messageId };
+    await this.messageService.deleteMessage(params);
+    this.eventEmitter.emit('message.delete', params);
     return { conversationId, messageId };
   }
 

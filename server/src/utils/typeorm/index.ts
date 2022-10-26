@@ -6,6 +6,11 @@ import { GroupMessage } from './entities/GroupMesage';
 import { Group } from './entities/Group';
 import { Conversation } from './entities/Conversation';
 import { Session } from './entities/Session';
+import { MessageAttachment } from './entities/MessageAttachment';
+import { GroupMessageAttachment } from './entities/GroupMessageAttachment';
+import { UserPresence } from './entities/UserPresence';
+import { Peer } from './entities/Peer';
+import { Profile } from './entities/Profile';
 
 const entities = [
   User,
@@ -16,6 +21,11 @@ const entities = [
   GroupMessage,
   FriendRequest,
   Friend,
+  Profile,
+  MessageAttachment,
+  GroupMessageAttachment,
+  UserPresence,
+  Peer,
 ];
 
 export default entities;
@@ -29,4 +39,9 @@ export {
   GroupMessage,
   Friend,
   FriendRequest,
+  Profile,
+  MessageAttachment,
+  GroupMessageAttachment,
+  UserPresence,
+  Peer,
 };

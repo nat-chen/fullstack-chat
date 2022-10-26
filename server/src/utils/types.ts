@@ -1,21 +1,32 @@
-import { Conversation, Group, GroupMessage, Message, User } from './typeorm';
+import {
+  Conversation,
+  Friend,
+  FriendRequest,
+  Group,
+  GroupMessage,
+  GroupMessageAttachment,
+  Message,
+  MessageAttachment,
+  User,
+} from './typeorm';
 import { Request } from 'express';
 
 export type CreateUserDetails = {
-  email: string;
+  username: string;
   password: string;
   firstName: string;
   lastName: string;
 };
 
 export type ValidateUserDetails = {
-  email: string;
+  username: string;
   password: string;
 };
 
 export type FindUserParams = Partial<{
   id: number;
   email: string;
+  username: string;
 }>;
 
 export type FindUserOptions = Partial<{
@@ -23,7 +34,7 @@ export type FindUserOptions = Partial<{
 }>;
 
 export type CreateConversationParams = {
-  email: string;
+  username: string;
   message: string;
 };
 
@@ -42,8 +53,9 @@ export type CreateParticipantParams = {
 };
 
 export type CreateMessageParams = {
-  content: string;
-  conversationId: number;
+  id: number;
+  content?: string;
+  attachments?: Attachment[];
   user: User;
 };
 
@@ -53,6 +65,12 @@ export type CreateMessageResponse = {
 };
 
 export type DeleteMessageParams = {
+  userId: number;
+  conversationId: number;
+  messageId: number;
+};
+
+export type FindMessageParams = {
   userId: number;
   conversationId: number;
   messageId: number;
@@ -83,9 +101,10 @@ export type FetchGroupsParams = {
 };
 
 export type CreateGroupMessageParams = {
-  groupId: number;
-  content: string;
   author: User;
+  attachments?: Attachment[];
+  content: string;
+  groupId: number;
 };
 
 export type CreateGroupMessageResponse = {
@@ -101,7 +120,7 @@ export type DeleteGroupMessageParams = {
 
 export type AddGroupRecipientParams = {
   id: number;
-  email: string;
+  username: string;
   userId: number;
 };
 
@@ -144,10 +163,10 @@ export type CheckUserGroupParams = {
 
 export type CreateFriendParams = {
   user: User;
-  email: string;
+  username: string;
 };
 
-export type FriendRequestStatus = 'accepted' | 'pending';
+export type FriendRequestStatus = 'accepted' | 'pending' | 'rejected';
 
 export type FriendRequestParams = {
   id: number;
@@ -157,4 +176,86 @@ export type FriendRequestParams = {
 export type CancelFriendRequestParams = {
   id: number;
   userId: number;
+};
+
+export type DeleteFriendRequestParams = {
+  id: number;
+  userId: number;
+};
+
+export type AcceptFriendRequestResponse = {
+  friend: Friend;
+  friendRequest: FriendRequest;
+};
+
+export type RemoveFriendEventPayload = {
+  friend: Friend;
+  userId: number;
+};
+
+export type UserProfileFiles = Partial<{
+  banner: Express.Multer.File[];
+  avatar: Express.Multer.File[];
+}>;
+
+export type UpdateUserProfileParams = Partial<{
+  about: string;
+  banner: Express.Multer.File;
+  avatar: Express.Multer.File;
+}>;
+
+export type ImagePermission = 'public-read' | 'private';
+export type UploadImageParams = {
+  key: string;
+  file: Express.Multer.File;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Attachment extends Express.Multer.File {}
+
+export type UploadMessageAttachmentParams = {
+  file: Attachment;
+  messageAttachment: MessageAttachment;
+};
+
+export type UploadGroupMessageAttachmentParams = {
+  file: Attachment;
+  messageAttachment: GroupMessageAttachment;
+};
+
+export type GetConversationMessagesParams = {
+  id: number;
+  limit: number;
+};
+
+export type UpdateConversationParams = Partial<{
+  id: number;
+  lastMessageSent: Message;
+}>;
+
+export type UserPresenceStatus = 'online' | 'away' | 'offline' | 'dnd';
+
+export type UpdateStatusMessageParams = {
+  user: User;
+  statusMessage: string;
+};
+
+export type CallHangUpPayload = {
+  receiver: User;
+  caller: User;
+};
+
+export type VoiceCallPayload = {
+  conversationId: number;
+  recipientId: number;
+};
+
+export type CallAcceptedPayload = {
+  caller: User;
+};
+
+export type UpdateGroupDetailsParams = {
+  id: number;
+  title?: string;
+  avatar?: Attachment;
 };

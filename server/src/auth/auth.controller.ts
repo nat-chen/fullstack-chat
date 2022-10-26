@@ -11,7 +11,8 @@ import {
 } from '@nestjs/common';
 import { instanceToPlain } from 'class-transformer';
 import { Request, Response } from 'express';
-import { IUserService } from '../users/user';
+import { AuthenticatedRequest } from 'src/utils/types';
+import { IUserService } from '../users/interfaces/user';
 import { Routes, Services } from '../utils/constants';
 import { IAuthService } from './auth';
 import { CreateUserDto } from './dtos/CreateUser.dto';
@@ -42,5 +43,10 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout() {}
+  @UseGuards(AuthenticatedGuard)
+  logout(@Req() req: AuthenticatedRequest, @Res() res: Response) {
+    req.logout((err) => {
+      return err ? res.send(400) : res.send(200);
+    });
+  }
 }

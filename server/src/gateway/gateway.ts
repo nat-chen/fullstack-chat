@@ -11,23 +11,30 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Services } from 'src/utils/constants';
+import { Services, WebsocketEvents } from 'src/utils/constants';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AuthenticatedSocket } from 'src/utils/interfaces';
 import { Message, Conversation, Group, GroupMessage } from 'src/utils/typeorm';
 import {
   AddGroupUserResponse,
+  CallAcceptedPayload,
+  CallHangUpPayload,
   CreateGroupMessageResponse,
   CreateMessageResponse,
   RemoveGroupUserResponse,
+  VoiceCallPayload,
 } from 'src/utils/types';
 import { IConversationsService } from 'src/conversations/conversations';
+import { IFriendsService } from 'src/friends/friends';
+import { CreateCallDto } from './dtos/CreateCallDto';
 
 @WebSocketGateway({
   cors: {
     origin: ['http://localhost:3000'],
     credentials: true,
   },
+  pingInterval: 10000,
+  pingTimeout: 15000,
 })
 export class MessagingGateway
   implements OnGatewayConnection, OnGatewayDisconnect
@@ -38,7 +45,9 @@ export class MessagingGateway
     @Inject(Services.CONVERSATIONS)
     private readonly conversationService: IConversationsService,
     @Inject(Services.GROUPS)
-    private readonly GroupService: IGroupService,
+    private readonly groupService: IGroupService,
+    @Inject(Services.FRIENDS_SERVICE)
+    private readonly friendsService: IFriendsService,
   ) {}
 
   @WebSocketServer()
@@ -62,9 +71,7 @@ export class MessagingGateway
     @MessageBody() data: any,
     @ConnectedSocket() socket: AuthenticatedSocket,
   ) {
-    console.log('handleGetOnlineGroupUsers');
-    console.log(data);
-    const group = await this.GroupService.findGroupById(parseInt(data.groupId));
+    const group = await this.groupService.findGroupById(parseInt(data.groupId));
     if (!group) return;
     const onlineUsers = [];
     const offlineUsers = [];
@@ -72,8 +79,6 @@ export class MessagingGateway
       const socket = this.sessions.getUserSocket(user.id);
       socket ? onlineUsers.push(user) : offlineUsers.push(user);
     });
-    console.log(onlineUsers);
-    console.log(offlineUsers);
     socket.emit('onlineGroupUsersReceived', { onlineUsers, offlineUsers });
   }
 
@@ -153,26 +158,24 @@ export class MessagingGateway
   @OnEvent('message.create')
   handleMessageCreateEvent(payload: CreateMessageResponse) {
     console.log('Inside message.create');
-    console.log(payload);
     const {
       author,
       conversation: { creator, recipient },
     } = payload.message;
+
     const authorSocket = this.sessions.getUserSocket(author.id);
     const recipientSocket =
       author.id === creator.id
         ? this.sessions.getUserSocket(recipient.id)
         : this.sessions.getUserSocket(creator.id);
+
     if (authorSocket) authorSocket.emit('onMessage', payload);
-    console.log(authorSocket);
-    console.log(recipientSocket);
     if (recipientSocket) recipientSocket.emit('onMessage', payload);
   }
 
   @OnEvent('conversation.create')
   handleConversationCreateEvent(payload: Conversation) {
     console.log('Inside conversation.create');
-    console.log(payload.recipient);
     const recipientSocket = this.sessions.getUserSocket(payload.recipient.id);
     if (recipientSocket) recipientSocket.emit('onConversation', payload);
   }
@@ -181,7 +184,7 @@ export class MessagingGateway
   async handleMessageDelete(payload) {
     console.log('Inside message.delete');
     console.log(payload);
-    const conversation = await this.conversationService.findConversationById(
+    const conversation = await this.conversationService.findById(
       payload.conversationId,
     );
     if (!conversation) return;
@@ -241,6 +244,7 @@ export class MessagingGateway
     recipientSocket && recipientSocket.emit('onGroupUserAdd', payload);
   }
 
+  @OnEvent('group.user.remove')
   handleGroupUserRemove(payload: RemoveGroupUserResponse) {
     const { group, user } = payload;
     const ROOM_NAME = `group-${payload.group.id}`;
@@ -256,14 +260,21 @@ export class MessagingGateway
     const onlineUsers = group.users
       .map((user) => this.sessions.getUserSocket(user.id) && user)
       .filter((user) => user);
+    // this.server.to(ROOM_NAME).emit('onlineGroupUsersReceived', { onlineUsers });
   }
 
   @OnEvent('group.owner.update')
   handleGroupOwnerUpdate(payload: Group) {
     const ROOM_NAME = `group-${payload.id}`;
     const newOwnerSocket = this.sessions.getUserSocket(payload.owner.id);
+    console.log('Inside group.owner.update');
     const { rooms } = this.server.sockets.adapter;
+    console.log(rooms.get(ROOM_NAME));
     const socketsInRoom = rooms.get(ROOM_NAME);
+    console.log('Sockets In Room');
+    console.log(socketsInRoom);
+    console.log(newOwnerSocket);
+    // Check if the new owner is in the group (room)
     this.server.to(ROOM_NAME).emit('onGroupOwnerUpdate', payload);
     if (newOwnerSocket && !socketsInRoom.has(newOwnerSocket.id)) {
       console.log('The new owner is not in the room...');
@@ -303,5 +314,149 @@ export class MessagingGateway
       console.log('User is online but there are no sockets in the room');
       return leftUserSocket.emit('onGroupParticipantLeft', payload);
     }
+  }
+
+  @SubscribeMessage('getOnlineFriends')
+  async handleFriendListRetrieve(
+    @MessageBody() data: any,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    const { user } = socket;
+    if (user) {
+      console.log('user is authenticated');
+      console.log(`fetching ${user.username}'s friends`);
+      const friends = await this.friendsService.getFriends(user.id);
+      const onlineFriends = friends.filter((friend) =>
+        this.sessions.getUserSocket(
+          user.id === friend.receiver.id
+            ? friend.sender.id
+            : friend.receiver.id,
+        ),
+      );
+      socket.emit('getOnlineFriends', onlineFriends);
+    }
+  }
+
+  @SubscribeMessage('onVideoCallInitiate')
+  async handleVideoCall(
+    @MessageBody() data: CreateCallDto,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('onVideoCallInitiate');
+    const caller = socket.user;
+    const receiverSocket = this.sessions.getUserSocket(data.recipientId);
+    if (!receiverSocket) socket.emit('onUserUnavailable');
+    receiverSocket.emit('onVideoCall', { ...data, caller });
+  }
+
+  @SubscribeMessage('videoCallAccepted')
+  async handleVideoCallAccepted(
+    @MessageBody() data: CallAcceptedPayload,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    const callerSocket = this.sessions.getUserSocket(data.caller.id);
+    const conversation = await this.conversationService.isCreated(
+      data.caller.id,
+      socket.user.id,
+    );
+    if (!conversation) return console.log('No conversation found');
+    if (callerSocket) {
+      console.log('Emitting onVideoCallAccept event');
+      const payload = { ...data, conversation, acceptor: socket.user };
+      callerSocket.emit('onVideoCallAccept', payload);
+      socket.emit('onVideoCallAccept', payload);
+    }
+  }
+
+  @SubscribeMessage(WebsocketEvents.VIDEO_CALL_REJECTED)
+  async handleVideoCallRejected(
+    @MessageBody() data,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('inside videoCallRejected event');
+    const receiver = socket.user;
+    const callerSocket = this.sessions.getUserSocket(data.caller.id);
+    callerSocket &&
+      callerSocket.emit(WebsocketEvents.VIDEO_CALL_REJECTED, { receiver });
+    socket.emit(WebsocketEvents.VIDEO_CALL_REJECTED, { receiver });
+  }
+
+  @SubscribeMessage('videoCallHangUp')
+  async handleVideoCallHangUp(
+    @MessageBody() { caller, receiver }: CallHangUpPayload,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('inside videoCallHangup event');
+    if (socket.user.id === caller.id) {
+      const receiverSocket = this.sessions.getUserSocket(receiver.id);
+      socket.emit('onVideoCallHangUp');
+      return receiverSocket && receiverSocket.emit('onVideoCallHangUp');
+    }
+    socket.emit('onVideoCallHangUp');
+    const callerSocket = this.sessions.getUserSocket(caller.id);
+    callerSocket && callerSocket.emit('onVideoCallHangUp');
+  }
+
+  @SubscribeMessage('onVoiceCallInitiate')
+  async handleVoiceCallInitiate(
+    @MessageBody() payload: VoiceCallPayload,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    const caller = socket.user;
+    const receiverSocket = this.sessions.getUserSocket(payload.recipientId);
+    if (!receiverSocket) socket.emit('onUserUnavailable');
+    receiverSocket.emit('onVoiceCall', { ...payload, caller });
+  }
+
+  @SubscribeMessage(WebsocketEvents.VOICE_CALL_ACCEPTED)
+  async handleVoiceCallAccepted(
+    @MessageBody() payload: CallAcceptedPayload,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('Inside onVoiceCallAccepted event');
+    const callerSocket = this.sessions.getUserSocket(payload.caller.id);
+    const conversation = await this.conversationService.isCreated(
+      payload.caller.id,
+      socket.user.id,
+    );
+    if (!conversation) return console.log('No conversation found');
+    if (callerSocket) {
+      console.log('Emitting onVoiceCallAccepted event');
+      const callPayload = { ...payload, conversation, acceptor: socket.user };
+      callerSocket.emit(WebsocketEvents.VOICE_CALL_ACCEPTED, callPayload);
+      socket.emit(WebsocketEvents.VOICE_CALL_ACCEPTED, callPayload);
+    }
+  }
+
+  @SubscribeMessage(WebsocketEvents.VOICE_CALL_HANG_UP)
+  async handleVoiceCallHangUp(
+    @MessageBody() { caller, receiver }: CallHangUpPayload,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('inside onVoiceCallHangUp event');
+    if (socket.user.id === caller.id) {
+      const receiverSocket = this.sessions.getUserSocket(receiver.id);
+      socket.emit(WebsocketEvents.VOICE_CALL_HANG_UP);
+      return (
+        receiverSocket &&
+        receiverSocket.emit(WebsocketEvents.VOICE_CALL_HANG_UP)
+      );
+    }
+    socket.emit(WebsocketEvents.VOICE_CALL_HANG_UP);
+    const callerSocket = this.sessions.getUserSocket(caller.id);
+    callerSocket && callerSocket.emit(WebsocketEvents.VOICE_CALL_HANG_UP);
+  }
+
+  @SubscribeMessage(WebsocketEvents.VOICE_CALL_REJECTED)
+  async handleVoiceCallRejected(
+    @MessageBody() data,
+    @ConnectedSocket() socket: AuthenticatedSocket,
+  ) {
+    console.log('inside onVoiceCallRejected event');
+    const receiver = socket.user;
+    const callerSocket = this.sessions.getUserSocket(data.caller.id);
+    callerSocket &&
+      callerSocket.emit(WebsocketEvents.VOICE_CALL_REJECTED, { receiver });
+    socket.emit(WebsocketEvents.VOICE_CALL_REJECTED, { receiver });
   }
 }

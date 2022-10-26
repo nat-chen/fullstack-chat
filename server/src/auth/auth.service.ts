@@ -1,5 +1,5 @@
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { IUserService } from 'src/users/user';
+import { IUserService } from 'src/users/interfaces/user';
 import { Services } from 'src/utils/constants';
 import { compareHash } from '../utils/helpers';
 import { ValidateUserDetails } from '../utils/types';
@@ -12,7 +12,7 @@ export class AuthService implements IAuthService {
   ) {}
   async validateUser(userDetails: ValidateUserDetails) {
     const user = await this.userService.findUser(
-      { email: userDetails.email },
+      { username: userDetails.username },
       { selectAll: true },
     );
     console.log(user);

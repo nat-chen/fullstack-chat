@@ -1,4 +1,5 @@
-import { IUserService } from 'src/users/user';
+import { FriendsService } from './../friends/friends.service';
+import { IUserService } from 'src/users/interfaces/user';
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Conversation, Message, User } from 'src/utils/typeorm';
@@ -17,6 +18,8 @@ export class ConversationsService implements IConversationsService {
     private readonly messageRepository: Repository<Message>,
     @Inject(Services.USERS)
     private readonly userService: IUserService,
+    @Inject(Services.FRIENDS_SERVICE)
+    private readonly friendService: FriendsService,
   ) {}
 
   async getConversations(id: number): Promise<Conversation[]> {
@@ -25,16 +28,26 @@ export class ConversationsService implements IConversationsService {
       .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
       .leftJoinAndSelect('conversation.creator', 'creator')
       .leftJoinAndSelect('conversation.recipient', 'recipient')
+      .leftJoinAndSelect('creator.peer', 'creatorPeer')
+      .leftJoinAndSelect('recipient.peer', 'recipientPeer')
+      .leftJoinAndSelect('creator.profile', 'creatorProfile')
+      .leftJoinAndSelect('recipient.profile', 'recipientProfile')
       .where('creator.id = :id', { id })
       .orWhere('recipient.id = :id', { id })
       .orderBy('conversation.lastMessageSentAt', 'DESC')
       .getMany();
   }
 
-  async findConversationById(id: number) {
+  async findById(id: number) {
     return this.conversationRepository.findOne({
       where: { id },
-      relations: ['lastMessageSent', 'creator', 'recipient'],
+      relations: [
+        'creator',
+        'recipient',
+        'creator.profile',
+        'recipient.profile',
+        'lastMessageSent',
+      ],
     });
   }
 
@@ -54,43 +67,64 @@ export class ConversationsService implements IConversationsService {
   }
 
   async createConversation(user: User, params: CreateConversationParams) {
-    const { email, message: content } = params;
-
-    const recipient = await this.userService.findUser({ email });
-
-    if (!recipient) {
-      throw new HttpException('Recipient not found', HttpStatus.BAD_REQUEST);
-    }
-    if (user.id === recipient.id)
-      throw new HttpException(
-        'Cannot Create Conversation',
-        HttpStatus.BAD_REQUEST,
+    const { username, message: content } = params;
+    const recipient = await this.userService.findUser({ username });
+    if (!recipient) throw new UserNotFoundException();
+    if (creator.id === recipient.id)
+      throw new CreateConversationException(
+        'Cannot create Conversation with yourself',
       );
-
-    const existingConversation = await this.isCreated(user.id, recipient.id);
-
-    if (existingConversation)
-      throw new HttpException('Conversation exists', HttpStatus.CONFLICT);
-
-    const conversation = this.conversationRepository.create({
-      creator: user,
-      recipient: recipient,
-    });
-
-    const savedConversation = await this.conversationRepository.save(
-      conversation,
+    const isFriends = await this.friendsService.isFriends(
+      creator.id,
+      recipient.id,
     );
-    const messageParams = { content, conversation, author: user };
-    const message = this.messageRepository.create(messageParams);
-    const savedMessage = await this.messageRepository.save(message);
-    return savedConversation;
+    if (!isFriends) throw new FriendNotFoundException();
+    const exists = await this.isCreated(creator.id, recipient.id);
+    if (exists) throw new ConversationExistsException();
+    const newConversation = this.conversationRepository.create({
+      creator,
+      recipient,
+    });
+    const conversation = await this.conversationRepository.save(
+      newConversation,
+    );
+    const newMessage = this.messageRepository.create({
+      content,
+      conversation,
+      author: creator,
+    });
+    await this.messageRepository.save(newMessage);
+    return conversation;
   }
 
   async hasAccess({ id, userId }: AccessParams) {
-    const conversation = await this.findConversationById(id);
+    const conversation = await this.findById(id);
     if (!conversation) throw new ConversationNotFoundException();
     return (
       conversation.creator.id === userId || conversation.recipient.id === userId
     );
+  }
+
+  save(conversation: Conversation): Promise<Conversation> {
+    return this.conversationRepository.save(conversation);
+  }
+
+  getMessages({
+    id,
+    limit,
+  }: GetConversationMessagesParams): Promise<Conversation> {
+    return this.conversationRepository
+      .createQueryBuilder('conversation')
+      .where('id = :id', { id })
+      .leftJoinAndSelect('conversation.lastMessageSent', 'lastMessageSent')
+      .leftJoinAndSelect('conversation.messages', 'message')
+      .where('conversation.id = :id', { id })
+      .orderBy('message.createdAt', 'DESC')
+      .limit(limit)
+      .getOne();
+  }
+
+  update({ id, lastMessageSent }: UpdateConversationParams) {
+    return this.conversationRepository.update(id, { lastMessageSent });
   }
 }
