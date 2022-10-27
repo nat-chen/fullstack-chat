@@ -3,27 +3,34 @@ import {
   UploadImageParams,
   UploadMessageAttachmentParams,
 } from './../utils/types';
-import { S3 } from '@aws-sdk/client-s3';
+import * as OSS from 'ali-oss';
 import { Inject, Injectable } from '@nestjs/common';
 import { Services } from 'src/utils/constants';
 import { compressImage } from 'src/utils/helpers';
 import { GroupMessageAttachment } from 'src/utils/typeorm';
 import { IImageStorageService } from './image-storage';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ImageStorageService implements IImageStorageService {
   constructor(
     @Inject(Services.SPACES_CLIENT)
-    private readonly spacesClient: S3,
+    private readonly spacesClient: OSS,
   ) {}
 
   upload(params: UploadImageParams) {
-    return this.spacesClient.putObject({
-      Bucket: 'chuachat',
-      Key: params.key,
-      Body: params.file.buffer,
-      ACL: 'public-read',
-      ContentType: params.file.mimetype,
+    const fileName = Buffer.from(params.file.originalname, 'latin1').toString(
+      // fix chinese filename encoding issue
+      'utf8',
+    );
+    const fileDirectory = path.resolve(__dirname, '../public');
+    const filePath = fileDirectory + fileName;
+    fs.mkdirSync(fileDirectory, { recursive: true });
+    fs.writeFile(filePath, Buffer.from(params.file.buffer), (err) => {
+      if (!err) {
+        this.spacesClient.put(fileName, filePath);
+      }
     });
   }
 

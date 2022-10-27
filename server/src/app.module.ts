@@ -18,16 +18,14 @@ import { EventsModule } from './events/events.module';
 import { ExistsModule } from './exists/exists.module';
 import { MessageAttachmentsModule } from './message-attachments/message-attachments.module';
 
-let envFilePath = '.end.development';
+let envFilePath = '.env.development';
 if (process.env.ENVIRONMENT === 'PRODUCTION') {
   envFilePath = '.env.production';
 }
 
 @Module({
   imports: [
-    AuthModule,
-    UsersModule,
-    ConfigModule.forRoot({ envFilePath }),
+    ConfigModule.forRoot({ envFilePath, isGlobal: true }),
     PassportModule.register({ session: true }),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -38,8 +36,10 @@ if (process.env.ENVIRONMENT === 'PRODUCTION') {
       database: process.env.MYSQL_DB_NAME,
       synchronize: true,
       entities,
-      logging: true,
+      logging: false,
     }),
+    AuthModule,
+    UsersModule,
     ConversationsModule,
     MessagesModule,
     GatewayModule,

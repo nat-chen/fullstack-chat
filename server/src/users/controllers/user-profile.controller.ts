@@ -5,7 +5,7 @@ import {
   Controller,
   Inject,
   Patch,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -27,7 +27,7 @@ export class UserProfilesController {
   @UseInterceptors(FileFieldsInterceptor(UserProfileFileFields))
   async updateUserProfile(
     @AuthUser() user: User,
-    @UploadedFile() files: UserProfileFiles,
+    @UploadedFiles() files: UserProfileFiles,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
   ) {
     const params: UpdateUserProfileParams = {};
