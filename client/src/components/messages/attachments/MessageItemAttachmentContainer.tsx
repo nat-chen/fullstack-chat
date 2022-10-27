@@ -15,7 +15,7 @@ export const MessageItemAttachmentContainer: FC<Props> = ({ message }) => {
 
   const onClick = (key: string) => {
     setShowOverlay(true);
-    setImageUrl(CDN_URL.ORIGINAL.concat(key));
+    setImageUrl(CDN_URL.BASE.concat(key));
   };
 
   const handleKeydown = (e: KeyboardEvent) =>
@@ -37,7 +37,7 @@ export const MessageItemAttachmentContainer: FC<Props> = ({ message }) => {
         {message.attachments?.map((attachment) => (
           <img
             key={attachment.key}
-            src={CDN_URL.PREVIEW.concat(attachment.key)}
+            src={CDN_URL.BASE.concat(attachment.key)}
             width={300}
             alt={attachment.key}
             onClick={() => onClick(attachment.key)}

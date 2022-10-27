@@ -13,8 +13,7 @@ import { ConfigModule } from '@nestjs/config';
         region: 'oss-cn-hangzhou',
         accessKeyId: process.env.ALIYUN_ACCESS_KEY_ID,
         accessKeySecret: process.env.ALIYUN_ACCESS_KEY_SECRET,
-        endpoint: 'https://oss-cn-hangzhou.aliyuncs.com',
-        bucket: 'fullstack-chat',
+        bucket: process.env.ALIYUN_BUCKET,
       }),
     },
     {
@@ -29,7 +28,7 @@ import { ConfigModule } from '@nestjs/config';
         region: 'oss-cn-hangzhou',
         accessKeyId: process.env.ALIYUN_ACCESS_KEY_ID,
         accessKeySecret: process.env.ALIYUN_ACCESS_KEY_SECRET,
-        endpoint: 'https://oss-cn-hangzhou.aliyuncs.com',
+        bucket: process.env.ALIYUN_BUCKET,
       }),
     },
     {

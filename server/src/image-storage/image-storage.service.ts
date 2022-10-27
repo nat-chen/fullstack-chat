@@ -20,18 +20,20 @@ export class ImageStorageService implements IImageStorageService {
   ) {}
 
   upload(params: UploadImageParams) {
-    const fileName = Buffer.from(params.file.originalname, 'latin1').toString(
-      // fix chinese filename encoding issue
-      'utf8',
-    );
+    // fix chinese filename encoding issue
+    // const fileName = Buffer.from(params.file.originalname, 'latin1').toString(
+    //   'utf8',
+    // );
+    const fileName = `${params.key}.${params.file.mimetype.split('/')[1]}`;
     const fileDirectory = path.resolve(__dirname, '../public');
     const filePath = fileDirectory + fileName;
     fs.mkdirSync(fileDirectory, { recursive: true });
-    fs.writeFile(filePath, Buffer.from(params.file.buffer), (err) => {
+    fs.writeFile(filePath, Buffer.from(params.file.buffer), async (err) => {
       if (!err) {
-        this.spacesClient.put(fileName, filePath);
+        await this.spacesClient.put(fileName, filePath);
       }
     });
+    return fileName;
   }
 
   async uploadMessageAttachment(params: UploadMessageAttachmentParams) {
